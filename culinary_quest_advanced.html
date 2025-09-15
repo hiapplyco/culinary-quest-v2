@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culinary Quest - Ultra Premium Loading Animations</title>
+    <!-- Anime.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gold: #FFD700;
+            --secondary-gold: #FFA500;
+            --dark-purple: #1a1a2e;
+            --mid-purple: #16213e;
+            --accent-pink: #e94560;
+            --accent-blue: #0f3460;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(233, 69, 96, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(15, 52, 96, 0.15) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        .logo-container {
+            display: inline-block;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 4.5rem;
+            background: linear-gradient(135deg,
+                #FFD700 0%,
+                #FFED4E 25%,
+                #FFA500 50%,
+                #FFD700 75%,
+                #FFED4E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
+            text-shadow:
+                0 0 40px rgba(255, 215, 0, 0.5),
+                0 0 80px rgba(255, 215, 0, 0.3);
+            letter-spacing: -0.03em;
+            position: relative;
+        }
+
+        @keyframes shimmer {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .loader-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 3rem;
+            width: 100%;
+            max-width: 1600px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .loader-container {
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.03) 0%,
+                rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(20px) saturate(1.8);
+            border-radius: 30px;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .loader-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(255, 215, 0, 0.05) 0%,
+                transparent 50%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .loader-container:hover::before {
+            opacity: 1;
+        }
+
+        .loader-container:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow:
+                0 30px 60px rgba(255, 215, 0, 0.1),
+                0 50px 100px rgba(0, 0, 0, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        .loader-wrapper {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader-title {
+            margin-top: 2rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: center;
+            background: linear-gradient(90deg, #fff, #FFD700, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 0.8rem;
+            font-size: 0.75rem;
+            opacity: 0.4;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* Ultra Realistic Wok with Fire */
+        .wok-fire {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        .wok-fire svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Molecular Gastronomy */
+        .molecular {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        .molecule {
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .molecule-center {
+            width: 40px;
+            height: 40px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle at 30% 30%,
+                #FFD700,
+                #FFA500);
+            box-shadow:
+                0 0 40px rgba(255, 215, 0, 0.6),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .molecule-orbit {
+            position: absolute;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .atom {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%,
+                #e94560,
+                #8b0023);
+            box-shadow:
+                0 0 20px rgba(233, 69, 96, 0.8),
+                inset -2px -2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Sushi Master */
+        .sushi-master {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        /* Pizza Oven */
+        .pizza-oven {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        /* Wine Decanter */
+        .wine-decanter {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        /* Bread Rising */
+        .bread-rising {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        /* Steam Dumpling */
+        .steam-dumpling {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        /* Cocktail Shaker */
+        .cocktail-shaker {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        /* Particles */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .fire-particle {
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle,
+                rgba(255, 200, 0, 1) 0%,
+                rgba(255, 100, 0, 0.8) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            filter: blur(1px);
+        }
+
+        .steam-particle {
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle,
+                rgba(255, 255, 255, 0.8) 0%,
+                rgba(255, 255, 255, 0.2) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            filter: blur(3px);
+        }
+
+        .sparkle {
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 6px white;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+
+            .loader-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <h1>Culinary Quest</h1>
+        </div>
+        <p class="subtitle">Generating Exquisite Recipes</p>
+    </div>
+
+    <div class="loader-grid">
+        <!-- Wok with Stir Fry Fire -->
+        <div class="loader-container" data-loader="wok">
+            <div class="loader-wrapper">
+                <div class="wok-fire">
+                    <svg viewBox="0 0 250 250">
+                        <!-- Wok -->
+                        <defs>
+                            <radialGradient id="wokGradient">
+                                <stop offset="0%" style="stop-color:#1a1a1a"/>
+                                <stop offset="100%" style="stop-color:#0a0a0a"/>
+                            </radialGradient>
+                            <radialGradient id="wokInner">
+                                <stop offset="0%" style="stop-color:#2a2a2a"/>
+                                <stop offset="100%" style="stop-color:#1a1a1a"/>
+                            </radialGradient>
+                            <filter id="fire-glow">
+                                <feGaussianBlur stdDeviation="4"/>
+                            </filter>
+                        </defs>
+
+                        <!-- Wok Body -->
+                        <ellipse cx="125" cy="150" rx="80" ry="75" fill="url(#wokGradient)"
+                                 stroke="#333" stroke-width="2"/>
+                        <ellipse cx="125" cy="150" rx="70" ry="65" fill="url(#wokInner)"/>
+
+                        <!-- Wok Handles -->
+                        <rect x="35" y="140" width="25" height="8" rx="4" fill="#1a1a1a"/>
+                        <rect x="190" y="140" width="25" height="8" rx="4" fill="#1a1a1a"/>
+
+                        <!-- Fire Flames -->
+                        <path class="flame1" d="M 80 150 Q 85 120 90 140 T 100 150"
+                              fill="none" stroke="#ff6b1a" stroke-width="3" opacity="0" filter="url(#fire-glow)"/>
+                        <path class="flame2" d="M 110 150 Q 115 110 120 130 T 130 150"
+                              fill="none" stroke="#ffa500" stroke-width="4" opacity="0" filter="url(#fire-glow)"/>
+                        <path class="flame3" d="M 140 150 Q 145 115 150 135 T 160 150"
+                              fill="none" stroke="#ff4500" stroke-width="3" opacity="0" filter="url(#fire-glow)"/>
+
+                        <!-- Food Items -->
+                        <circle class="ingredient1" cx="100" cy="140" r="8" fill="#90EE90" opacity="0"/>
+                        <circle class="ingredient2" cx="125" cy="145" r="6" fill="#FFA500" opacity="0"/>
+                        <circle class="ingredient3" cx="150" cy="142" r="7" fill="#FF6347" opacity="0"/>
+                    </svg>
+                    <div class="particle fire-particle" style="bottom: 40%; left: 30%;"></div>
+                    <div class="particle fire-particle" style="bottom: 40%; left: 50%;"></div>
+                    <div class="particle fire-particle" style="bottom: 40%; left: 70%;"></div>
+                </div>
+            </div>
+            <div class="loader-title">Wok Hei Mastery</div>
+            <div class="loading-text">Stir-Frying</div>
+        </div>
+
+        <!-- Molecular Gastronomy -->
+        <div class="loader-container" data-loader="molecular">
+            <div class="loader-wrapper">
+                <div class="molecular">
+                    <div class="molecule-center"></div>
+                    <div class="molecule-orbit" style="width: 150px; height: 150px;">
+                        <div class="atom" style="top: 0; left: 50%; transform: translateX(-50%);"></div>
+                    </div>
+                    <div class="molecule-orbit" style="width: 180px; height: 180px; transform: translate(-50%, -50%) rotate(60deg);">
+                        <div class="atom" style="top: 0; left: 50%; transform: translateX(-50%);"></div>
+                    </div>
+                    <div class="molecule-orbit" style="width: 200px; height: 200px; transform: translate(-50%, -50%) rotate(120deg);">
+                        <div class="atom" style="top: 0; left: 50%; transform: translateX(-50%);"></div>
+                    </div>
+                    <div class="particle sparkle" style="top: 20%; left: 20%;"></div>
+                    <div class="particle sparkle" style="top: 30%; right: 25%;"></div>
+                    <div class="particle sparkle" style="bottom: 30%; left: 25%;"></div>
+                </div>
+            </div>
+            <div class="loader-title">Molecular Magic</div>
+            <div class="loading-text">Transforming</div>
+        </div>
+
+        <!-- Sushi Master -->
+        <div class="loader-container" data-loader="sushi">
+            <div class="loader-wrapper">
+                <div class="sushi-master">
+                    <svg viewBox="0 0 250 250">
+                        <defs>
+                            <linearGradient id="riceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ffffff"/>
+                                <stop offset="100%" style="stop-color:#f0f0f0"/>
+                            </linearGradient>
+                            <radialGradient id="salmonGradient">
+                                <stop offset="0%" style="stop-color:#ff8a65"/>
+                                <stop offset="100%" style="stop-color:#ff6b4a"/>
+                            </radialGradient>
+                            <linearGradient id="noriGradient">
+                                <stop offset="0%" style="stop-color:#1a1a1a"/>
+                                <stop offset="100%" style="stop-color:#0d0d0d"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Bamboo Mat -->
+                        <g class="bamboo-mat">
+                            <rect x="50" y="160" width="150" height="60" fill="#8b7355" rx="3"/>
+                            <line x1="50" y1="170" x2="200" y2="170" stroke="#6b5945" stroke-width="1"/>
+                            <line x1="50" y1="180" x2="200" y2="180" stroke="#6b5945" stroke-width="1"/>
+                            <line x1="50" y1="190" x2="200" y2="190" stroke="#6b5945" stroke-width="1"/>
+                            <line x1="50" y1="200" x2="200" y2="200" stroke="#6b5945" stroke-width="1"/>
+                            <line x1="50" y1="210" x2="200" y2="210" stroke="#6b5945" stroke-width="1"/>
+                        </g>
+
+                        <!-- Sushi Roll -->
+                        <g class="sushi-roll" transform="translate(125, 125)">
+                            <!-- Rice -->
+                            <ellipse cx="0" cy="0" rx="40" ry="35" fill="url(#riceGradient)" opacity="0"/>
+                            <!-- Nori -->
+                            <rect class="nori" x="-45" y="-20" width="90" height="40" fill="url(#noriGradient)" rx="5" opacity="0"/>
+                            <!-- Salmon -->
+                            <ellipse class="salmon" cx="0" cy="-5" rx="35" ry="25" fill="url(#salmonGradient)" opacity="0"/>
+                            <!-- Avocado -->
+                            <ellipse class="avocado" cx="-10" cy="5" rx="15" ry="10" fill="#90ee90" opacity="0"/>
+                            <!-- Cucumber -->
+                            <circle class="cucumber" cx="15" cy="5" r="8" fill="#4caf50" opacity="0"/>
+                        </g>
+
+                        <!-- Chopsticks -->
+                        <g class="chopsticks" transform="translate(125, 125)">
+                            <rect x="50" y="-2" width="80" height="4" fill="#8b4513" rx="2" transform="rotate(-10)"/>
+                            <rect x="50" y="2" width="80" height="4" fill="#8b4513" rx="2" transform="rotate(10)"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div class="loader-title">Sushi Artistry</div>
+            <div class="loading-text">Rolling</div>
+        </div>
+
+        <!-- Pizza Oven -->
+        <div class="loader-container" data-loader="pizza">
+            <div class="loader-wrapper">
+                <div class="pizza-oven">
+                    <svg viewBox="0 0 250 250">
+                        <defs>
+                            <radialGradient id="ovenGlow">
+                                <stop offset="0%" style="stop-color:#ff6b1a; stop-opacity:0.8"/>
+                                <stop offset="100%" style="stop-color:#ff4500; stop-opacity:0.2"/>
+                            </radialGradient>
+                            <radialGradient id="doughGradient">
+                                <stop offset="0%" style="stop-color:#f5deb3"/>
+                                <stop offset="100%" style="stop-color:#daa520"/>
+                            </radialGradient>
+                            <filter id="heat-distortion">
+                                <feTurbulence baseFrequency="0.02" numOctaves="2" result="turbulence"/>
+                                <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="2"/>
+                            </filter>
+                        </defs>
+
+                        <!-- Oven Structure -->
+                        <rect x="40" y="80" width="170" height="120" fill="#8b4513" rx="60"/>
+                        <rect x="50" y="90" width="150" height="100" fill="#1a1a1a" rx="50"/>
+                        <ellipse cx="125" cy="140" rx="65" ry="40" fill="url(#ovenGlow)" opacity="0.6"/>
+
+                        <!-- Pizza -->
+                        <g class="pizza" transform="translate(125, 140)">
+                            <circle r="45" fill="url(#doughGradient)" opacity="0"/>
+                            <!-- Sauce -->
+                            <circle class="sauce" r="40" fill="#c0392b" opacity="0"/>
+                            <!-- Cheese -->
+                            <circle class="cheese" r="38" fill="#ffd93d" opacity="0.8" style="display:none"/>
+                            <!-- Toppings -->
+                            <circle class="pepperoni1" cx="-15" cy="-10" r="6" fill="#8b0000" style="display:none"/>
+                            <circle class="pepperoni2" cx="10" cy="-5" r="6" fill="#8b0000" style="display:none"/>
+                            <circle class="pepperoni3" cx="0" cy="15" r="6" fill="#8b0000" style="display:none"/>
+                            <ellipse class="basil1" cx="-10" cy="10" rx="8" ry="4" fill="#228b22" transform="rotate(45 -10 10)" style="display:none"/>
+                            <ellipse class="basil2" cx="15" cy="8" rx="8" ry="4" fill="#228b22" transform="rotate(-30 15 8)" style="display:none"/>
+                        </g>
+
+                        <!-- Heat Waves -->
+                        <path class="heat-wave" d="M 60 70 Q 65 60 70 70 T 80 70" stroke="rgba(255,100,0,0.3)" stroke-width="2" fill="none" filter="url(#heat-distortion)"/>
+                        <path class="heat-wave" d="M 100 70 Q 105 60 110 70 T 120 70" stroke="rgba(255,150,0,0.3)" stroke-width="2" fill="none" filter="url(#heat-distortion)"/>
+                        <path class="heat-wave" d="M 140 70 Q 145 60 150 70 T 160 70" stroke="rgba(255,100,0,0.3)" stroke-width="2" fill="none" filter="url(#heat-distortion)"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="loader-title">Wood-Fired Pizza</div>
+            <div class="loading-text">Baking</div>
+        </div>
+
+        <!-- Wine Decanter -->
+        <div class="loader-container" data-loader="wine">
+            <div class="loader-wrapper">
+                <div class="wine-decanter">
+                    <svg viewBox="0 0 250 250">
+                        <defs>
+                            <linearGradient id="wineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#722f37"/>
+                                <stop offset="100%" style="stop-color:#4a0e0e"/>
+                            </linearGradient>
+                            <filter id="glass-reflection">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                <feOffset dx="2" dy="2" result="offsetblur"/>
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.2"/>
+                                </feComponentTransfer>
+                                <feMerge>
+                                    <feMergeNode/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Decanter -->
+                        <path d="M 125 40 L 110 100 L 90 180 Q 90 200 125 200 Q 160 200 160 180 L 140 100 Z"
+                              fill="none" stroke="#666" stroke-width="2" opacity="0.3"/>
+                        <path d="M 125 40 L 110 100 L 90 180 Q 90 200 125 200 Q 160 200 160 180 L 140 100 Z"
+                              fill="rgba(255,255,255,0.05)" filter="url(#glass-reflection)"/>
+
+                        <!-- Wine -->
+                        <path class="wine-fill" d="M 115 120 L 95 180 Q 95 195 125 195 Q 155 195 155 180 L 135 120 Z"
+                              fill="url(#wineGradient)" opacity="0"/>
+
+                        <!-- Wine Swirl -->
+                        <ellipse class="wine-swirl" cx="125" cy="150" rx="0" ry="0"
+                                 fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1" opacity="0"/>
+
+                        <!-- Sparkles -->
+                        <circle class="wine-sparkle1" cx="110" cy="80" r="1" fill="white" opacity="0"/>
+                        <circle class="wine-sparkle2" cx="140" cy="90" r="1" fill="white" opacity="0"/>
+                        <circle class="wine-sparkle3" cx="125" cy="60" r="1" fill="white" opacity="0"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="loader-title">Wine Pairing</div>
+            <div class="loading-text">Decanting</div>
+        </div>
+
+        <!-- Artisan Bread -->
+        <div class="loader-container" data-loader="bread">
+            <div class="loader-wrapper">
+                <div class="bread-rising">
+                    <svg viewBox="0 0 250 250">
+                        <defs>
+                            <radialGradient id="breadGradient">
+                                <stop offset="0%" style="stop-color:#d4a574"/>
+                                <stop offset="100%" style="stop-color:#8b6939"/>
+                            </radialGradient>
+                            <pattern id="flourDust" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <circle cx="5" cy="5" r="1" fill="rgba(255,255,255,0.3)"/>
+                                <circle cx="15" cy="15" r="0.5" fill="rgba(255,255,255,0.2)"/>
+                                <circle cx="25" cy="10" r="0.8" fill="rgba(255,255,255,0.25)"/>
+                                <circle cx="35" cy="20" r="0.6" fill="rgba(255,255,255,0.2)"/>
+                            </pattern>
+                        </defs>
+
+                        <!-- Baking Surface -->
+                        <rect x="40" y="170" width="170" height="20" fill="#8b7355" rx="3"/>
+
+                        <!-- Bread Loaf -->
+                        <ellipse class="bread-base" cx="125" cy="150" rx="60" ry="40" fill="url(#breadGradient)" opacity="0"/>
+
+                        <!-- Score Marks -->
+                        <path class="score1" d="M 95 140 Q 105 135 115 140" stroke="#6b4423" stroke-width="2" fill="none" opacity="0"/>
+                        <path class="score2" d="M 135 140 Q 145 135 155 140" stroke="#6b4423" stroke-width="2" fill="none" opacity="0"/>
+                        <path class="score3" d="M 115 150 Q 125 145 135 150" stroke="#6b4423" stroke-width="2" fill="none" opacity="0"/>
+
+                        <!-- Flour Dust -->
+                        <rect class="flour-dust" x="40" y="40" width="170" height="170" fill="url(#flourDust)" opacity="0"/>
+
+                        <!-- Steam -->
+                        <ellipse class="steam1" cx="100" cy="120" rx="10" ry="15" fill="rgba(255,255,255,0.3)" opacity="0"/>
+                        <ellipse class="steam2" cx="125" cy="110" rx="12" ry="18" fill="rgba(255,255,255,0.3)" opacity="0"/>
+                        <ellipse class="steam3" cx="150" cy="115" rx="10" ry="15" fill="rgba(255,255,255,0.3)" opacity="0"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="loader-title">Artisan Bread</div>
+            <div class="loading-text">Proofing</div>
+        </div>
+
+        <!-- Dim Sum Steamer -->
+        <div class="loader-container" data-loader="dimsum">
+            <div class="loader-wrapper">
+                <div class="steam-dumpling">
+                    <svg viewBox="0 0 250 250">
+                        <defs>
+                            <radialGradient id="bambooGradient">
+                                <stop offset="0%" style="stop-color:#d4a574"/>
+                                <stop offset="100%" style="stop-color:#8b6939"/>
+                            </radialGradient>
+                            <linearGradient id="dumplingGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#fff8dc"/>
+                                <stop offset="100%" style="stop-color:#f5deb3"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Bamboo Steamer Layers -->
+                        <g class="steamer-layer1">
+                            <ellipse cx="125" cy="180" rx="70" ry="15" fill="url(#bambooGradient)"/>
+                            <rect x="55" y="165" width="140" height="30" fill="url(#bambooGradient)"/>
+                            <ellipse cx="125" cy="165" rx="70" ry="15" fill="#8b6939"/>
+                        </g>
+
+                        <g class="steamer-layer2">
+                            <ellipse cx="125" cy="140" rx="70" ry="15" fill="url(#bambooGradient)"/>
+                            <rect x="55" y="125" width="140" height="30" fill="url(#bambooGradient)"/>
+                            <ellipse cx="125" cy="125" rx="70" ry="15" fill="#8b6939"/>
+                        </g>
+
+                        <!-- Dumplings -->
+                        <g class="dumplings">
+                            <ellipse class="dumpling1" cx="100" cy="120" rx="15" ry="12" fill="url(#dumplingGradient)" opacity="0"/>
+                            <ellipse class="dumpling2" cx="125" cy="115" rx="15" ry="12" fill="url(#dumplingGradient)" opacity="0"/>
+                            <ellipse class="dumpling3" cx="150" cy="120" rx="15" ry="12" fill="url(#dumplingGradient)" opacity="0"/>
+                        </g>
+
+                        <!-- Steam Effect -->
+                        <g class="steam-effects">
+                            <path class="steam-wisp1" d="M 100 100 Q 95 80 100 60" stroke="rgba(255,255,255,0.4)" stroke-width="3" fill="none" opacity="0"/>
+                            <path class="steam-wisp2" d="M 125 95 Q 130 75 125 55" stroke="rgba(255,255,255,0.4)" stroke-width="4" fill="none" opacity="0"/>
+                            <path class="steam-wisp3" d="M 150 100 Q 155 80 150 60" stroke="rgba(255,255,255,0.4)" stroke-width="3" fill="none" opacity="0"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div class="loader-title">Dim Sum Delights</div>
+            <div class="loading-text">Steaming</div>
+        </div>
+
+        <!-- Cocktail Mixology -->
+        <div class="loader-container" data-loader="cocktail">
+            <div class="loader-wrapper">
+                <div class="cocktail-shaker">
+                    <svg viewBox="0 0 250 250">
+                        <defs>
+                            <linearGradient id="shakerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#c0c0c0"/>
+                                <stop offset="50%" style="stop-color:#808080"/>
+                                <stop offset="100%" style="stop-color:#606060"/>
+                            </linearGradient>
+                            <radialGradient id="liquidGradient">
+                                <stop offset="0%" style="stop-color:#ff69b4"/>
+                                <stop offset="100%" style="stop-color:#ff1493"/>
+                            </radialGradient>
+                            <filter id="ice-filter">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+                                <feOffset dx="1" dy="1" result="offsetblur"/>
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.4"/>
+                                </feComponentTransfer>
+                                <feMerge>
+                                    <feMergeNode/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Shaker Body -->
+                        <g class="shaker-body">
+                            <path d="M 100 80 L 95 160 L 105 180 L 145 180 L 155 160 L 150 80 Z"
+                                  fill="url(#shakerGradient)" stroke="#404040" stroke-width="2"/>
+                            <!-- Cap -->
+                            <ellipse cx="125" cy="80" rx="25" ry="8" fill="#909090"/>
+                            <rect x="110" y="70" width="30" height="10" fill="#a0a0a0" rx="2"/>
+                        </g>
+
+                        <!-- Liquid Inside -->
+                        <path class="liquid" d="M 102 100 L 98 155 L 107 170 L 143 170 L 152 155 L 148 100 Z"
+                              fill="url(#liquidGradient)" opacity="0.7" style="display:none"/>
+
+                        <!-- Ice Cubes -->
+                        <g class="ice-cubes">
+                            <rect class="ice1" x="110" y="120" width="12" height="12" fill="rgba(255,255,255,0.7)"
+                                  transform="rotate(15 116 126)" filter="url(#ice-filter)" style="display:none"/>
+                            <rect class="ice2" x="128" y="115" width="12" height="12" fill="rgba(255,255,255,0.7)"
+                                  transform="rotate(-20 134 121)" filter="url(#ice-filter)" style="display:none"/>
+                            <rect class="ice3" x="120" y="135" width="10" height="10" fill="rgba(255,255,255,0.7)"
+                                  transform="rotate(30 125 140)" filter="url(#ice-filter)" style="display:none"/>
+                        </g>
+
+                        <!-- Garnish -->
+                        <g class="garnish" style="display:none">
+                            <ellipse cx="125" cy="75" rx="20" ry="3" fill="#90ee90"/>
+                            <path d="M 125 75 Q 130 70 135 72" stroke="#90ee90" stroke-width="2" fill="none"/>
+                        </g>
+
+                        <!-- Sparkle Effects -->
+                        <circle class="sparkle1" cx="105" cy="100" r="1" fill="white" opacity="0"/>
+                        <circle class="sparkle2" cx="145" cy="110" r="1" fill="white" opacity="0"/>
+                        <circle class="sparkle3" cx="125" cy="130" r="1" fill="white" opacity="0"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="loader-title">Mixology Magic</div>
+            <div class="loading-text">Shaking</div>
+        </div>
+    </div>
+
+    <script>
+        // Advanced Wok Animation with Fire Physics
+        function animateWok() {
+            const tl = anime.timeline({ loop: true });
+
+            // Wok tossing motion
+            tl.add({
+                targets: '.wok-fire svg',
+                rotate: [-5, 5, -5],
+                translateY: [0, -10, 0],
+                duration: 800,
+                easing: 'easeInOutQuad'
+            })
+            // Ingredients appearing
+            .add({
+                targets: ['.ingredient1', '.ingredient2', '.ingredient3'],
+                opacity: [0, 1],
+                translateY: [-30, 0],
+                rotate: () => anime.random(-180, 180),
+                delay: anime.stagger(100),
+                duration: 500,
+                easing: 'easeOutBack'
+            })
+            // Fire flames animation with physics
+            .add({
+                targets: ['.flame1', '.flame2', '.flame3'],
+                opacity: [0, 0.8, 0.6, 0.9, 0],
+                strokeDashoffset: [anime.setDashoffset, 0],
+                d: [
+                    { value: 'M 80 150 Q 85 100 90 120 T 100 150' },
+                    { value: 'M 80 150 Q 85 80 90 100 T 100 150' }
+                ],
+                delay: anime.stagger(100),
+                duration: 1500,
+                easing: 'easeInOutSine'
+            }, '-=600')
+            // Ingredients tossing
+            .add({
+                targets: ['.ingredient1', '.ingredient2', '.ingredient3'],
+                translateY: [
+                    { value: -40, duration: 400, easing: 'easeOutQuad' },
+                    { value: 0, duration: 400, easing: 'easeInQuad' }
+                ],
+                rotate: () => anime.random(360, 720),
+                delay: anime.stagger(50),
+                duration: 800
+            })
+            // Fire particles
+            .add({
+                targets: '.wok-fire .fire-particle',
+                translateY: [0, -60],
+                translateX: () => anime.random(-20, 20),
+                scale: [0, 1.5, 0],
+                opacity: [0, 1, 0],
+                delay: anime.stagger(100),
+                duration: 1200,
+                easing: 'easeOutQuad'
+            }, '-=800')
+            // Ingredients disappearing
+            .add({
+                targets: ['.ingredient1', '.ingredient2', '.ingredient3'],
+                opacity: 0,
+                scale: 0,
+                duration: 300,
+                easing: 'easeInQuad'
+            });
+        }
+
+        // Molecular Gastronomy Animation
+        function animateMolecular() {
+            const tl = anime.timeline({ loop: true });
+
+            // Orbiting atoms with complex paths
+            tl.add({
+                targets: '.molecule-orbit',
+                rotate: 360,
+                duration: 4000,
+                easing: 'linear',
+                loop: true
+            })
+            // Central molecule pulsing
+            .add({
+                targets: '.molecule-center',
+                scale: [1, 1.2, 1],
+                boxShadow: [
+                    '0 0 40px rgba(255, 215, 0, 0.6)',
+                    '0 0 60px rgba(255, 215, 0, 0.9)',
+                    '0 0 40px rgba(255, 215, 0, 0.6)'
+                ],
+                duration: 2000,
+                easing: 'easeInOutSine',
+                loop: true
+            }, 0)
+            // Atoms transforming
+            .add({
+                targets: '.atom',
+                scale: [1, 1.3, 0.8, 1],
+                background: [
+                    'radial-gradient(circle at 30% 30%, #e94560, #8b0023)',
+                    'radial-gradient(circle at 30% 30%, #FFD700, #FFA500)',
+                    'radial-gradient(circle at 30% 30%, #e94560, #8b0023)'
+                ],
+                duration: 1500,
+                delay: anime.stagger(200),
+                easing: 'easeInOutElastic(1, 0.5)'
+            }, 0)
+            // Sparkle effects
+            .add({
+                targets: '.molecular .sparkle',
+                opacity: [0, 1, 0],
+                scale: [0, 1.5, 0],
+                rotate: () => anime.random(0, 360),
+                duration: 1000,
+                delay: anime.stagger(300),
+                easing: 'easeOutQuad',
+                loop: true
+            }, 0);
+        }
+
+        // Sushi Master Animation
+        function animateSushi() {
+            const tl = anime.timeline({ loop: true });
+
+            // Rolling motion
+            tl.add({
+                targets: '.bamboo-mat',
+                scaleY: [1, 0.9, 1],
+                translateY: [0, -5, 0],
+                duration: 800,
+                easing: 'easeInOutQuad'
+            })
+            // Ingredients appearing
+            .add({
+                targets: ['.nori', '.salmon', '.avocado', '.cucumber'],
+                opacity: [0, 1],
+                scale: [0, 1],
+                delay: anime.stagger(150),
+                duration: 600,
+                easing: 'easeOutBack'
+            })
+            // Rolling animation
+            .add({
+                targets: '.sushi-roll',
+                rotate: [0, 360],
+                duration: 1500,
+                easing: 'easeInOutQuad'
+            })
+            // Chopsticks picking
+            .add({
+                targets: '.chopsticks',
+                translateX: [-100, 0],
+                translateY: [0, -20, 0],
+                rotate: [0, -15, 0],
+                duration: 1200,
+                easing: 'easeInOutQuad'
+            })
+            // Final presentation
+            .add({
+                targets: '.sushi-roll',
+                scale: [1, 1.1, 1],
+                duration: 600,
+                easing: 'easeInOutElastic(1, 0.5)'
+            });
+        }
+
+        // Pizza Oven Animation
+        function animatePizza() {
+            const tl = anime.timeline({ loop: true });
+
+            // Pizza sliding in
+            tl.add({
+                targets: '.pizza circle:first-child',
+                opacity: [0, 1],
+                scale: [0, 1],
+                rotate: [180, 0],
+                duration: 800,
+                easing: 'easeOutBack'
+            })
+            // Adding sauce
+            .add({
+                targets: '.sauce',
+                opacity: [0, 0.8],
+                scale: [0.5, 1],
+                duration: 500,
+                easing: 'easeOutQuad'
+            })
+            // Cheese melting
+            .add({
+                targets: '.cheese',
+                display: 'block',
+                opacity: [0, 0.8],
+                scale: [0.8, 1],
+                duration: 600,
+                easing: 'easeOutQuad',
+                begin: function(anim) {
+                    anime.set('.cheese', {display: 'block'});
+                }
+            })
+            // Toppings falling
+            .add({
+                targets: ['.pepperoni1', '.pepperoni2', '.pepperoni3', '.basil1', '.basil2'],
+                display: 'block',
+                translateY: [-30, 0],
+                opacity: [0, 1],
+                rotate: () => anime.random(-180, 180),
+                delay: anime.stagger(100),
+                duration: 600,
+                easing: 'easeOutBounce',
+                begin: function(anim) {
+                    anime.set(['.pepperoni1', '.pepperoni2', '.pepperoni3', '.basil1', '.basil2'], {display: 'block'});
+                }
+            })
+            // Heat waves
+            .add({
+                targets: '.heat-wave',
+                opacity: [0, 0.6, 0],
+                translateY: [-10, -30],
+                delay: anime.stagger(200),
+                duration: 1500,
+                easing: 'easeOutQuad',
+                loop: 2
+            }, '-=1000')
+            // Pizza rotating in oven
+            .add({
+                targets: '.pizza',
+                rotate: [0, 360],
+                duration: 2000,
+                easing: 'linear'
+            })
+            // Crust browning (scale effect)
+            .add({
+                targets: '.pizza circle:first-child',
+                fill: ['#f5deb3', '#d4a574', '#8b6939'],
+                duration: 1500,
+                easing: 'linear'
+            }, '-=1500');
+        }
+
+        // Wine Decanter Animation
+        function animateWine() {
+            const tl = anime.timeline({ loop: true });
+
+            // Wine pouring
+            tl.add({
+                targets: '.wine-fill',
+                opacity: [0, 0.9],
+                d: [
+                    { value: 'M 125 120 L 125 120 L 125 120 Q 125 120 125 120 Q 125 120 125 120 L 125 120 Z' },
+                    { value: 'M 115 120 L 95 180 Q 95 195 125 195 Q 155 195 155 180 L 135 120 Z' }
+                ],
+                duration: 2000,
+                easing: 'easeInOutQuad'
+            })
+            // Wine swirling
+            .add({
+                targets: '.wine-swirl',
+                opacity: [0, 0.5],
+                rx: [0, 25],
+                ry: [0, 15],
+                duration: 800,
+                easing: 'easeOutQuad'
+            })
+            .add({
+                targets: '.wine-swirl',
+                rotate: [0, 360],
+                duration: 2000,
+                easing: 'easeInOutSine'
+            })
+            // Sparkles
+            .add({
+                targets: ['.wine-sparkle1', '.wine-sparkle2', '.wine-sparkle3'],
+                opacity: [0, 1, 0],
+                scale: [0, 2, 0],
+                delay: anime.stagger(200),
+                duration: 1000,
+                easing: 'easeOutQuad'
+            }, '-=1500')
+            // Decanter tilt
+            .add({
+                targets: '.wine-decanter svg',
+                rotate: [-5, 5, 0],
+                duration: 1500,
+                easing: 'easeInOutQuad'
+            }, '-=2000');
+        }
+
+        // Artisan Bread Animation
+        function animateBread() {
+            const tl = anime.timeline({ loop: true });
+
+            // Dough appearing
+            tl.add({
+                targets: '.bread-base',
+                opacity: [0, 1],
+                scale: [0.5, 1],
+                duration: 800,
+                easing: 'easeOutBack'
+            })
+            // Rising effect
+            .add({
+                targets: '.bread-base',
+                ry: [40, 50, 60],
+                translateY: [0, -10, -20],
+                duration: 2000,
+                easing: 'easeInOutQuad'
+            })
+            // Score marks appearing
+            .add({
+                targets: ['.score1', '.score2', '.score3'],
+                opacity: [0, 1],
+                strokeDashoffset: [anime.setDashoffset, 0],
+                delay: anime.stagger(200),
+                duration: 600,
+                easing: 'easeOutQuad'
+            }, '-=1000')
+            // Flour dust
+            .add({
+                targets: '.flour-dust',
+                opacity: [0, 0.3, 0],
+                duration: 1500,
+                easing: 'easeInOutQuad'
+            }, '-=1500')
+            // Steam rising
+            .add({
+                targets: ['.steam1', '.steam2', '.steam3'],
+                opacity: [0, 0.6, 0],
+                translateY: [0, -40],
+                scale: [0.5, 1.5],
+                delay: anime.stagger(150),
+                duration: 1500,
+                easing: 'easeOutQuad'
+            }, '-=1000')
+            // Golden brown color
+            .add({
+                targets: '.bread-base',
+                fill: ['#d4a574', '#8b6939', '#654321'],
+                duration: 1500,
+                easing: 'linear'
+            }, '-=1000');
+        }
+
+        // Dim Sum Steamer Animation
+        function animateDimSum() {
+            const tl = anime.timeline({ loop: true });
+
+            // Steamer layers stacking
+            tl.add({
+                targets: '.steamer-layer2',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 600,
+                easing: 'easeOutBack'
+            })
+            .add({
+                targets: '.steamer-layer1',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 600,
+                easing: 'easeOutBack'
+            }, '-=400')
+            // Dumplings appearing
+            .add({
+                targets: ['.dumpling1', '.dumpling2', '.dumpling3'],
+                opacity: [0, 1],
+                scale: [0, 1],
+                delay: anime.stagger(150),
+                duration: 600,
+                easing: 'easeOutElastic(1, 0.5)'
+            })
+            // Steam wisps
+            .add({
+                targets: ['.steam-wisp1', '.steam-wisp2', '.steam-wisp3'],
+                opacity: [0, 0.8, 0],
+                strokeDashoffset: [anime.setDashoffset, 0],
+                translateY: [0, -20],
+                delay: anime.stagger(150),
+                duration: 2000,
+                easing: 'easeOutQuad'
+            })
+            // Lid lifting effect
+            .add({
+                targets: '.steamer-layer2',
+                translateY: [0, -10, 0],
+                duration: 800,
+                easing: 'easeInOutQuad'
+            }, '-=1500')
+            // Dumplings jiggling
+            .add({
+                targets: ['.dumpling1', '.dumpling2', '.dumpling3'],
+                translateY: [0, -3, 0],
+                delay: anime.stagger(100),
+                duration: 400,
+                easing: 'easeInOutSine',
+                loop: 2
+            }, '-=1000');
+        }
+
+        // Cocktail Shaker Animation
+        function animateCocktail() {
+            const tl = anime.timeline({ loop: true });
+
+            // Shaker appearing
+            tl.add({
+                targets: '.shaker-body',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 600,
+                easing: 'easeOutBack'
+            })
+            // Adding liquid
+            .add({
+                targets: '.liquid',
+                display: 'block',
+                opacity: [0, 0.7],
+                scaleY: [0, 1],
+                transformOrigin: 'bottom',
+                duration: 800,
+                easing: 'easeOutQuad',
+                begin: function() {
+                    anime.set('.liquid', {display: 'block'});
+                }
+            })
+            // Ice cubes dropping
+            .add({
+                targets: ['.ice1', '.ice2', '.ice3'],
+                display: 'block',
+                translateY: [-50, 0],
+                opacity: [0, 1],
+                rotate: () => anime.random(-45, 45),
+                delay: anime.stagger(100),
+                duration: 500,
+                easing: 'easeOutBounce',
+                begin: function() {
+                    anime.set(['.ice1', '.ice2', '.ice3'], {display: 'block'});
+                }
+            })
+            // Shaking motion
+            .add({
+                targets: '.cocktail-shaker svg',
+                rotate: [
+                    { value: -15, duration: 100 },
+                    { value: 15, duration: 100 },
+                    { value: -15, duration: 100 },
+                    { value: 15, duration: 100 },
+                    { value: 0, duration: 200 }
+                ],
+                translateY: [
+                    { value: -10, duration: 100 },
+                    { value: 10, duration: 100 },
+                    { value: -10, duration: 100 },
+                    { value: 10, duration: 100 },
+                    { value: 0, duration: 200 }
+                ],
+                easing: 'easeInOutQuad',
+                loop: 3
+            })
+            // Sparkles during shaking
+            .add({
+                targets: ['.sparkle1', '.sparkle2', '.sparkle3'],
+                opacity: [0, 1, 0],
+                scale: [0, 2, 0],
+                translateY: () => anime.random(-20, 20),
+                translateX: () => anime.random(-20, 20),
+                delay: anime.stagger(100),
+                duration: 600,
+                easing: 'easeOutQuad'
+            }, '-=1500')
+            // Adding garnish
+            .add({
+                targets: '.garnish',
+                display: 'block',
+                opacity: [0, 1],
+                translateY: [-20, 0],
+                duration: 600,
+                easing: 'easeOutBack',
+                begin: function() {
+                    anime.set('.garnish', {display: 'block'});
+                }
+            });
+        }
+
+        // Global animation effects
+        function initGlobalAnimations() {
+            // Floating particles
+            anime({
+                targets: '.particle',
+                translateY: () => anime.random(-100, 100),
+                translateX: () => anime.random(-50, 50),
+                scale: [0, 1, 0],
+                opacity: [0, 1, 0],
+                duration: () => anime.random(3000, 5000),
+                delay: () => anime.random(0, 2000),
+                easing: 'easeInOutSine',
+                loop: true
+            });
+
+            // Container glow on hover
+            document.querySelectorAll('.loader-container').forEach(container => {
+                container.addEventListener('mousemove', (e) => {
+                    const rect = container.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    container.style.setProperty('--mouse-x', `${x}%`);
+                    container.style.setProperty('--mouse-y', `${y}%`);
+                });
+            });
+
+            // Loading text pulse
+            anime({
+                targets: '.loading-text',
+                opacity: [0.4, 0.8, 0.4],
+                letterSpacing: ['0.3em', '0.4em', '0.3em'],
+                duration: 2000,
+                easing: 'easeInOutSine',
+                loop: true
+            });
+        }
+
+        // Initialize all animations
+        document.addEventListener('DOMContentLoaded', () => {
+            animateWok();
+            animateMolecular();
+            animateSushi();
+            animatePizza();
+            animateWine();
+            animateBread();
+            animateDimSum();
+            animateCocktail();
+            initGlobalAnimations();
+        });
+    </script>
+</body>
+</html>

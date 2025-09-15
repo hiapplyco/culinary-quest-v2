@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Meal Prep & Adventure Animations</title>
+    <!-- Anime.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        /*
+         * Overall page styling
+         * We reuse the original gradient background and card layout but
+         * improve contrast and responsiveness. The grid will wrap
+         * automatically on smaller screens and each loader card receives
+         * a subtle glass‑effect with a blurred backdrop.
+         */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .loader-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .loader-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            position: relative;
+        }
+
+        .loader-title {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            color: #fff;
+        }
+
+        .loading-text {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+
+        /* Cooking Pot Loader – refined */
+        .cooking-pot {
+            /* Larger, more proportional cooking pot */
+            position: relative;
+            width: 160px;
+            height: 150px;
+        }
+
+        .cooking-pot .pot {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 60px;
+            background: linear-gradient(#4a4a4a, #2c2c2c);
+            border-radius: 0 0 60px 60px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+        }
+
+        .cooking-pot .pot-handle {
+            position: absolute;
+            top: 10px;
+            width: 35px;
+            height: 10px;
+            background: #262626;
+            border-radius: 5px;
+        }
+
+        .cooking-pot .pot-handle.left { left: -30px; }
+        .cooking-pot .pot-handle.right { right: -30px; }
+
+        .cooking-pot .ingredient {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+        }
+
+        .cooking-pot .ingredient.tomato { background: #ff6b6b; }
+        .cooking-pot .ingredient.carrot { background: #ffa500; border-radius: 40%; }
+        .cooking-pot .ingredient.broccoli { background: #4caf50; }
+
+        .cooking-pot .steam {
+            position: absolute;
+            bottom: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 2px;
+            opacity: 0;
+        }
+
+        /* Map Journey Loader – refined */
+        .map-journey {
+            /* Adjusted ratio and positions for a more realistic map */
+            position: relative;
+            width: 200px;
+            height: 140px;
+        }
+
+        .map-journey .map-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #f7e8c8;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .map-journey .path {
+            stroke: #8b5a2b;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 400;
+            stroke-dashoffset: 400;
+        }
+
+        .map-journey .food-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            transform-origin: center;
+        }
+
+        .map-journey .food-marker.apple {
+            background: #ff4444;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            top: 30px;
+            left: 35px;
+        }
+        .map-journey .food-marker.bread {
+            background: #d4a574;
+            border-radius: 40% 40% 0 0;
+            top: 70px;
+            left: 90px;
+        }
+        .map-journey .food-marker.cheese {
+            background: #ffd93d;
+            clip-path: polygon(0 30%, 100% 0, 100% 100%, 0 70%);
+            top: 45px;
+            right: 40px;
+        }
+
+        /* Recipe Book Loader – refined */
+        .recipe-book {
+            /* Larger, more book‑like proportions */
+            position: relative;
+            width: 160px;
+            height: 120px;
+            perspective: 800px;
+        }
+
+        .recipe-book .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #8b4513;
+            border-radius: 5px 15px 15px 5px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.35);
+            transform-origin: left center;
+        }
+
+        .recipe-book .book-page {
+            position: absolute;
+            width: 94%;
+            height: 88%;
+            background: #fff;
+            top: 6%;
+            left: 3%;
+            border-radius: 3px 10px 10px 3px;
+            transform-origin: left center;
+            opacity: 0;
+        }
+
+        .recipe-book .page-content {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            background: linear-gradient(180deg, #ddd 20%, #ddd 23%, transparent 23%, transparent 28%, #ddd 28%, #ddd 31%, transparent 31%, transparent 37%, #ddd 37%, #ddd 40%, transparent 40%);
+        }
+
+        /* Compass Meal Loader – refined */
+        .compass-meal {
+            /* Larger compass for better proportions */
+            position: relative;
+            width: 160px;
+            height: 160px;
+        }
+
+        .compass-meal .compass-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid #333;
+            border-radius: 50%;
+            background: #f5f5f5;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+        }
+
+        .compass-meal .compass-needle {
+            position: absolute;
+            width: 4px;
+            height: 70px;
+            background: #ff4444;
+            top: 50%;
+            left: 50%;
+            transform-origin: center bottom;
+            transform: translate(-50%, -100%);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        .compass-meal .meal-icon {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+        }
+
+        .compass-meal .meal-icon.north { top: 6px; left: 50%; transform: translateX(-50%); }
+        .compass-meal .meal-icon.east { right: 6px; top: 50%; transform: translateY(-50%); }
+        .compass-meal .meal-icon.south { bottom: 6px; left: 50%; transform: translateX(-50%); }
+        .compass-meal .meal-icon.west { left: 6px; top: 50%; transform: translateY(-50%); }
+
+        /* Adventure Path Loader – refined */
+        .adventure-path {
+            /* Adjusted proportions for adventure path */
+            position: relative;
+            width: 200px;
+            height: 140px;
+        }
+
+        .adventure-path .mountain {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 65px solid #666;
+            opacity: 0.35;
+        }
+
+        .adventure-path .mountain.m1 { bottom: 0; left: 15px; }
+        .adventure-path .mountain.m2 { bottom: 0; right: 20px; border-bottom-color: #555; }
+
+        .adventure-path .footstep {
+            position: absolute;
+            width: 16px;
+            height: 20px;
+            background: #333;
+            border-radius: 50% 50% 45% 45%;
+            opacity: 0;
+            transform-origin: center;
+        }
+
+        .adventure-path .backpack {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            background: #8b4513;
+            border-radius: 10px 10px 20px 20px;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+        }
+
+        .adventure-path .backpack::before {
+            content: '🍎';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+        }
+
+        /* New Loader: Mixing Bowl */
+        .mixing-bowl {
+            /* Larger bowl with more realistic proportions */
+            position: relative;
+            width: 160px;
+            height: 150px;
+        }
+        .mixing-bowl .bowl {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 65px;
+            border-radius: 0 0 70px 70px;
+            background: #3a3a3a;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+        }
+        .mixing-bowl .bowl-inner {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 50px;
+            border-radius: 0 0 60px 60px;
+            background: #555;
+        }
+        .mixing-bowl .spoon {
+            position: absolute;
+            bottom: 75px;
+            left: 50%;
+            width: 8px;
+            height: 80px;
+            background: #c8a165;
+            border-radius: 4px;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-30deg);
+        }
+        .mixing-bowl .swirl {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            width: 70px;
+            height: 35px;
+            border: 3px solid rgba(255,255,255,0.7);
+            border-top: none;
+            border-radius: 0 0 35px 35px;
+            opacity: 0;
+            transform-origin: center center;
+        }
+        .mixing-bowl .swirl.swirl2 {
+            width: 48px;
+            height: 24px;
+            bottom: 46px;
+            border-width: 2px;
+        }
+
+        /* New Loader: Chopping Board */
+        .chopping-board {
+            /* Larger chopping board with improved proportions */
+            position: relative;
+            width: 160px;
+            height: 130px;
+        }
+        .chopping-board .board {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 80px;
+            background: #d4a574;
+            border-radius: 10px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.35);
+        }
+        .chopping-board .knife {
+            position: absolute;
+            bottom: 42px;
+            left: 50%;
+            width: 90px;
+            height: 12px;
+            background: #d8d8d8;
+            border-radius: 6px;
+            transform-origin: left center;
+            transform: translateX(-45px) rotate(0deg);
+        }
+        .chopping-board .knife::after {
+            content: '';
+            position: absolute;
+            right: -14px;
+            top: -5px;
+            width: 16px;
+            height: 20px;
+            background: #666;
+            border-radius: 4px;
+        }
+        .chopping-board .veggie {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            opacity: 0;
+        }
+        .chopping-board .veggie.carrot { background: #ffa500; }
+        .chopping-board .veggie.cucumber { background: #4caf50; }
+        .chopping-board .veggie.tomato { background: #ff6b6b; }
+
+        /* New Loader: Rolling Dough */
+        .rolling-dough {
+            /* Enlarged dough area for better realism */
+            position: relative;
+            width: 160px;
+            height: 130px;
+        }
+        .rolling-dough .dough {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 60px;
+            background: #f5deb3;
+            border-radius: 60px;
+        }
+        .rolling-dough .pin {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            width: 100px;
+            height: 14px;
+            background: #deb887;
+            border-radius: 7px;
+        }
+
+        /* New Loader: Grill */
+        .grill-loader {
+            /* Enlarged grill for better proportions */
+            position: relative;
+            width: 160px;
+            height: 130px;
+        }
+        .grill-loader .grill {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #333;
+            border-radius: 12px 12px 6px 6px;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.35);
+        }
+        .grill-loader .grill::before,
+        .grill-loader .grill::after {
+            content: '';
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            height: 3px;
+            background: #555;
+            top: 7px;
+        }
+        .grill-loader .grill::after { top: 15px; }
+
+        .grill-loader .skewer {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            width: 70px;
+            height: 12px;
+            background: #c0c0c0;
+            border-radius: 6px;
+            transform: translateX(-50%);
+        }
+        .grill-loader .smoke {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            width: 10px;
+            height: 25px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            opacity: 0;
+        }
+        .grill-loader .smoke.smoke2 { left: 60%; }
+
+        /* New Loader: Spice Grinder */
+        .spice-grinder {
+            /* Larger spice grinder for better realism */
+            position: relative;
+            width: 160px;
+            height: 130px;
+        }
+        .spice-grinder .grinder {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 70px;
+            background: #8b4513;
+            border-radius: 30px 30px 12px 12px;
+        }
+        .spice-grinder .grinder-top {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 25px;
+            background: #a0522d;
+            border-radius: 25px;
+        }
+        .spice-grinder .grain {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #d2b48c;
+            opacity: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>🍳 Enhanced Meal Prep & Adventure Animations 🗺️</h1>
+    <div class="loader-grid">
+        <!-- Refined Cooking Pot Loader -->
+        <div class="loader-container">
+            <div class="cooking-pot">
+                <div class="pot">
+                    <div class="pot-handle left"></div>
+                    <div class="pot-handle right"></div>
+                </div>
+                <div class="ingredient tomato"></div>
+                <div class="ingredient carrot"></div>
+                <div class="ingredient broccoli"></div>
+                <div class="steam" style="left: 40%"></div>
+                <div class="steam" style="left: 50%"></div>
+                <div class="steam" style="left: 60%"></div>
+            </div>
+            <div class="loader-title">Preparing Your Meal</div>
+            <div class="loading-text">COOKING...</div>
+        </div>
+
+        <!-- Refined Map Journey Loader -->
+        <div class="loader-container">
+            <div class="map-journey">
+                <div class="map-bg">
+                    <svg width="180" height="130">
+                        <path class="path" d="M 15 65 Q 45 20 90 65 T 165 65"></path>
+                    </svg>
+                </div>
+                <div class="food-marker apple"></div>
+                <div class="food-marker bread"></div>
+                <div class="food-marker cheese"></div>
+            </div>
+            <div class="loader-title">Charting Food Journey</div>
+            <div class="loading-text">EXPLORING...</div>
+        </div>
+
+        <!-- Refined Recipe Book Loader -->
+        <div class="loader-container">
+            <div class="recipe-book">
+                <div class="book-cover"></div>
+                <div class="book-page">
+                    <div class="page-content"></div>
+                </div>
+            </div>
+            <div class="loader-title">Reading Recipes</div>
+            <div class="loading-text">DISCOVERING...</div>
+        </div>
+
+        <!-- Refined Compass Meal Loader -->
+        <div class="loader-container">
+            <div class="compass-meal">
+                <div class="compass-circle"></div>
+                <div class="compass-needle"></div>
+                <div class="meal-icon north">🥗</div>
+                <div class="meal-icon east">🍝</div>
+                <div class="meal-icon south">🍰</div>
+                <div class="meal-icon west">🥘</div>
+            </div>
+            <div class="loader-title">Finding Flavors</div>
+            <div class="loading-text">NAVIGATING...</div>
+        </div>
+
+        <!-- Refined Adventure Path Loader -->
+        <div class="loader-container">
+            <div class="adventure-path">
+                <div class="mountain m1"></div>
+                <div class="mountain m2"></div>
+                <div class="footstep" style="bottom: 15px; left: 15px;"></div>
+                <div class="footstep" style="bottom: 30px; left: 45px; transform: rotate(15deg);"></div>
+                <div class="footstep" style="bottom: 40px; left: 75px;"></div>
+                <div class="footstep" style="bottom: 50px; left: 110px; transform: rotate(-10deg);"></div>
+                <div class="backpack"></div>
+            </div>
+            <div class="loader-title">Packing Provisions</div>
+            <div class="loading-text">ADVENTURING...</div>
+        </div>
+
+        <!-- New Loader: Mixing Bowl -->
+        <div class="loader-container">
+            <div class="mixing-bowl">
+                <div class="bowl"></div>
+                <div class="bowl-inner"></div>
+                <div class="spoon"></div>
+                <div class="swirl swirl1"></div>
+                <div class="swirl swirl2"></div>
+            </div>
+            <div class="loader-title">Mixing Ingredients</div>
+            <div class="loading-text">STIRRING...</div>
+        </div>
+
+        <!-- New Loader: Chopping Board -->
+        <div class="loader-container">
+            <div class="chopping-board">
+                <div class="board"></div>
+                <div class="knife"></div>
+                <div class="veggie carrot"></div>
+                <div class="veggie cucumber"></div>
+                <div class="veggie tomato"></div>
+            </div>
+            <div class="loader-title">Chopping Veggies</div>
+            <div class="loading-text">CHOP CHOP...</div>
+        </div>
+
+        <!-- New Loader: Rolling Dough -->
+        <div class="loader-container">
+            <div class="rolling-dough">
+                <div class="dough"></div>
+                <div class="pin"></div>
+            </div>
+            <div class="loader-title">Rolling Dough</div>
+            <div class="loading-text">FLATTENING...</div>
+        </div>
+
+        <!-- New Loader: Grill Loader -->
+        <div class="loader-container">
+            <div class="grill-loader">
+                <div class="grill"></div>
+                <div class="skewer"></div>
+                <div class="smoke smoke1"></div>
+                <div class="smoke smoke2"></div>
+            </div>
+            <div class="loader-title">Grilling Goodies</div>
+            <div class="loading-text">SIZZLING...</div>
+        </div>
+
+        <!-- New Loader: Spice Grinder -->
+        <div class="loader-container">
+            <div class="spice-grinder">
+                <div class="grinder"></div>
+                <div class="grinder-top"></div>
+                <div class="grain grain1"></div>
+                <div class="grain grain2"></div>
+                <div class="grain grain3"></div>
+            </div>
+            <div class="loader-title">Grinding Spices</div>
+            <div class="loading-text">CRUSHING...</div>
+        </div>
+    </div>
+
+    <script>
+        /*
+         * Animation functions for each loader.
+         * Timelines are defined separately for clarity and to allow fine‑tuning.
+         */
+
+        // Cooking Pot Animation – improved with gentle bob and ingredient drop
+        function animateCookingPot() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.cooking-pot .pot',
+                translateY: [10, 0, 10],
+                duration: 1800,
+                easing: 'easeInOutSine'
+            })
+            .add({
+                targets: '.cooking-pot .ingredient',
+                opacity: [0, 1],
+                translateY: [-40, 70],
+                rotate: 360,
+                delay: anime.stagger(300),
+                duration: 1000,
+                easing: 'easeOutQuad'
+            }, '-=1500')
+            .add({
+                targets: '.cooking-pot .ingredient',
+                opacity: [1, 0],
+                duration: 500,
+                easing: 'easeInQuad'
+            })
+            .add({
+                targets: '.cooking-pot .steam',
+                opacity: [0, 0.7, 0],
+                translateY: [-10, -45],
+                duration: 1800,
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad'
+            }, '-=1000');
+        }
+
+        // Map Journey Animation – refined stroke drawing and marker hops
+        function animateMapJourney() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.map-journey .path',
+                strokeDashoffset: [400, 0],
+                duration: 2200,
+                easing: 'easeInOutSine'
+            })
+            .add({
+                targets: '.map-journey .food-marker',
+                opacity: [0, 1],
+                scale: [0, 1],
+                delay: anime.stagger(350),
+                duration: 600,
+                easing: 'easeOutBack'
+            }, '-=1800')
+            .add({
+                targets: '.map-journey .food-marker',
+                translateY: [0, -10, 0],
+                duration: 1000,
+                delay: anime.stagger(180),
+                easing: 'easeInOutSine',
+                loop: 2
+            })
+            .add({
+                targets: '.map-journey .food-marker',
+                opacity: 0,
+                scale: 0,
+                duration: 500,
+                delay: anime.stagger(60),
+                easing: 'easeInQuad'
+            })
+            .add({
+                targets: '.map-journey .path',
+                strokeDashoffset: [0, 400],
+                duration: 1200,
+                easing: 'easeInQuart'
+            }, '-=500');
+        }
+
+        // Recipe Book Animation – smoother page flip with shading
+        function animateRecipeBook() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.recipe-book .book-cover',
+                rotateY: [0, -40],
+                duration: 900,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.recipe-book .book-page',
+                opacity: [0, 1],
+                rotateY: [90, 0],
+                duration: 600,
+                easing: 'easeOutCubic'
+            }, '-=500')
+            .add({
+                targets: '.recipe-book .page-content',
+                opacity: [0, 1],
+                duration: 500
+            })
+            .add({
+                targets: '.recipe-book .book-page',
+                rotateY: [0, -180],
+                duration: 1500,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.recipe-book .book-page',
+                opacity: [1, 0],
+                duration: 400,
+                easing: 'easeInQuad'
+            }, '-=600')
+            .add({
+                targets: '.recipe-book .book-cover',
+                rotateY: [-40, 0],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            });
+        }
+
+        // Compass Meal Animation – smoother needle spin and icon dance
+        function animateCompassMeal() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.compass-meal .compass-needle',
+                rotate: [0, 360],
+                duration: 2500,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.compass-meal .meal-icon',
+                opacity: [0, 1],
+                scale: [0, 1],
+                delay: anime.stagger(300),
+                duration: 700,
+                easing: 'easeOutBack'
+            }, '-=2000')
+            .add({
+                targets: '.compass-meal .compass-needle',
+                rotate: [360, 540, 360],
+                duration: 2500,
+                easing: 'easeInOutElastic(1, .6)'
+            })
+            .add({
+                targets: '.compass-meal .meal-icon',
+                rotate: 360,
+                duration: 2000,
+                delay: anime.stagger(200),
+                easing: 'easeInOutQuad'
+            }, '-=2300')
+            .add({
+                targets: '.compass-meal .meal-icon',
+                opacity: 0,
+                scale: 0,
+                delay: anime.stagger(100),
+                duration: 500,
+                easing: 'easeInQuad'
+            });
+        }
+
+        // Adventure Path Animation – more rhythmic backpack movement and footsteps
+        function animateAdventurePath() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.adventure-path .footstep',
+                opacity: [0, 1],
+                scale: [0, 1],
+                delay: anime.stagger(250),
+                duration: 500,
+                easing: 'easeOutBack'
+            })
+            .add({
+                targets: '.adventure-path .backpack',
+                opacity: [0, 1],
+                translateY: [10, 0],
+                duration: 900,
+                easing: 'easeOutElastic(1, .6)'
+            }, '-=600')
+            .add({
+                targets: '.adventure-path .backpack',
+                translateX: ['-50%', 'calc(-50% + 100px)'],
+                rotate: [-5, 5, -5, 5, 0],
+                duration: 2600,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.adventure-path .mountain',
+                scale: [1, 1.1, 1],
+                duration: 1800,
+                delay: anime.stagger(250),
+                easing: 'easeInOutSine'
+            }, '-=2200')
+            .add({
+                targets: '.adventure-path .footstep',
+                opacity: 0,
+                scale: 0,
+                delay: anime.stagger(80, { direction: 'reverse' }),
+                duration: 500,
+                easing: 'easeInQuad'
+            })
+            .add({
+                targets: '.adventure-path .backpack',
+                opacity: 0,
+                scale: 0,
+                duration: 500,
+                easing: 'easeInQuad'
+            }, '-=300');
+        }
+
+        // New Animation: Mixing Bowl
+        function animateMixingBowl() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.mixing-bowl .spoon',
+                rotate: [-25, 25, -25],
+                duration: 2800,
+                easing: 'easeInOutSine'
+            })
+            .add({
+                targets: '.mixing-bowl .swirl1',
+                opacity: [0, 1, 0],
+                scale: [0, 1, 0],
+                rotate: [0, 360],
+                duration: 2500,
+                easing: 'easeInOutQuad'
+            }, '-=2500')
+            .add({
+                targets: '.mixing-bowl .swirl2',
+                opacity: [0, 1, 0],
+                scale: [0, 1, 0],
+                rotate: [0, -360],
+                duration: 2300,
+                easing: 'easeInOutQuad'
+            }, '-=2500');
+        }
+
+        // New Animation: Chopping Board
+        function animateChoppingBoard() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.chopping-board .knife',
+                rotate: [0, -25, 0],
+                translateX: [-45, -20, -45],
+                duration: 1000,
+                easing: 'easeOutCubic'
+            })
+            .add({
+                targets: '.chopping-board .veggie',
+                opacity: [0, 1],
+                translateY: [-12, 0],
+                delay: anime.stagger(200),
+                duration: 400,
+                easing: 'easeOutBack'
+            }, '-=700')
+            .add({
+                targets: '.chopping-board .veggie',
+                translateX: [0, (el, i) => (i - 1) * 25],
+                translateY: [0, 12],
+                rotate: [0, 360],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.chopping-board .veggie',
+                opacity: 0,
+                scale: 0,
+                delay: anime.stagger(150),
+                duration: 500,
+                easing: 'easeInQuad'
+            });
+        }
+
+        // New Animation: Rolling Dough
+        function animateRollingDough() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.rolling-dough .pin',
+                translateX: [0, 60, 0],
+                duration: 2500,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.rolling-dough .dough',
+                scaleX: [1, 1.25, 1],
+                scaleY: [1, 0.9, 1],
+                duration: 2500,
+                easing: 'easeInOutQuad'
+            }, '-=2500');
+        }
+
+        // New Animation: Grill Loader
+        function animateGrill() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.grill-loader .smoke1',
+                opacity: [0, 0.7, 0],
+                translateY: [0, -35],
+                duration: 2000,
+                easing: 'easeOutQuad'
+            })
+            .add({
+                targets: '.grill-loader .smoke2',
+                opacity: [0, 0.7, 0],
+                translateY: [0, -35],
+                duration: 2000,
+                easing: 'easeOutQuad'
+            }, '-=1800')
+            .add({
+                targets: '.grill-loader .skewer',
+                translateY: [0, -6, 0, -6, 0],
+                rotate: [-5, 5, -5, 5, 0],
+                duration: 2400,
+                easing: 'easeInOutQuad'
+            }, '-=2200');
+        }
+
+        // New Animation: Spice Grinder
+        function animateSpiceGrinder() {
+            const tl = anime.timeline({ loop: true });
+            tl.add({
+                targets: '.spice-grinder .grinder-top',
+                rotate: [0, 360],
+                duration: 2800,
+                easing: 'linear'
+            })
+            .add({
+                targets: ['.spice-grinder .grain1', '.spice-grinder .grain2', '.spice-grinder .grain3'],
+                opacity: [0, 1, 0],
+                translateY: [0, 40],
+                translateX: [0, (el, i) => (i - 1) * 12],
+                delay: anime.stagger(250),
+                duration: 1000,
+                easing: 'easeOutQuad'
+            }, '-=2600');
+        }
+
+        // Loading text animations
+        function animateLoadingTexts() {
+            anime({
+                targets: '.loading-text',
+                opacity: [0.3, 1, 0.3],
+                duration: 2400,
+                easing: 'easeInOutQuad',
+                loop: true
+            });
+        }
+
+        // Initialize all animations
+        document.addEventListener('DOMContentLoaded', () => {
+            animateCookingPot();
+            animateMapJourney();
+            animateRecipeBook();
+            animateCompassMeal();
+            animateAdventurePath();
+            animateMixingBowl();
+            animateChoppingBoard();
+            animateRollingDough();
+            animateGrill();
+            animateSpiceGrinder();
+            animateLoadingTexts();
+        });
+    </script>
+</body>
+</html>

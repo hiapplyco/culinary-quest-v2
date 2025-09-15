@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culinary Quest - Recipe Generation Loading Animations</title>
+    <!-- Anime.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2b42 50%, #3e3456 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(120, 90, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 90, 120, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(90, 200, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            z-index: 1;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffa500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        .loader-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            width: 100%;
+            max-width: 1400px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .loader-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(20px) saturate(1.5);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 320px;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .loader-container:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        .loader-title {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+
+        .loading-text {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            opacity: 0.5;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* Premium Cooking Pot with Realistic Details */
+        .cooking-pot {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .cooking-pot .pot-body {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 80px;
+            background: linear-gradient(180deg,
+                #e8e8e8 0%,
+                #d0d0d0 20%,
+                #b8b8b8 50%,
+                #a0a0a0 100%);
+            border-radius: 10px 10px 65px 65px;
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.5),
+                inset 0 -5px 10px rgba(0,0,0,0.3),
+                inset 0 2px 5px rgba(255,255,255,0.5);
+            position: relative;
+        }
+
+        .cooking-pot .pot-body::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            height: 15px;
+            background: linear-gradient(90deg,
+                rgba(255,255,255,0.3) 0%,
+                rgba(255,255,255,0.1) 50%,
+                rgba(255,255,255,0.3) 100%);
+            border-radius: 50%;
+        }
+
+        .cooking-pot .pot-lid {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 135px;
+            height: 30px;
+            background: linear-gradient(180deg,
+                #f0f0f0 0%,
+                #d8d8d8 50%,
+                #c0c0c0 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.4),
+                inset 0 2px 3px rgba(255,255,255,0.6);
+        }
+
+        .cooking-pot .pot-lid-handle {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 16px;
+            background: linear-gradient(180deg, #606060 0%, #404040 100%);
+            border-radius: 15px 15px 5px 5px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+        }
+
+        .cooking-pot .pot-handle {
+            position: absolute;
+            top: 15px;
+            width: 40px;
+            height: 12px;
+            background: linear-gradient(90deg, #404040 0%, #606060 50%, #404040 100%);
+            border-radius: 6px;
+            box-shadow:
+                0 3px 6px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(255,255,255,0.2);
+        }
+
+        .cooking-pot .pot-handle.left { left: -35px; }
+        .cooking-pot .pot-handle.right { right: -35px; }
+
+        .cooking-pot .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%,
+                rgba(255,255,255,0.9),
+                rgba(255,255,255,0.4));
+            opacity: 0;
+        }
+
+        .cooking-pot .steam-particle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle,
+                rgba(255,255,255,0.8) 0%,
+                rgba(255,255,255,0.2) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            filter: blur(3px);
+            opacity: 0;
+        }
+
+        /* Premium Cast Iron Pan */
+        .cast-iron-pan {
+            position: relative;
+            width: 200px;
+            height: 180px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .cast-iron-pan .pan-body {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle,
+                #2a2a2a 0%,
+                #1a1a1a 40%,
+                #0f0f0f 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.6),
+                inset 0 -3px 8px rgba(0,0,0,0.8),
+                inset 0 3px 5px rgba(60,60,60,0.5);
+            position: relative;
+        }
+
+        .cast-iron-pan .pan-body::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                #3a3a3a 0%,
+                #2a2a2a 100%);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .cast-iron-pan .pan-handle {
+            position: absolute;
+            bottom: 90px;
+            left: -30px;
+            width: 100px;
+            height: 20px;
+            background: linear-gradient(90deg,
+                #1a1a1a 0%,
+                #2a2a2a 20%,
+                #2a2a2a 80%,
+                #1a1a1a 100%);
+            border-radius: 10px;
+            transform: rotate(-15deg);
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.5),
+                inset 0 2px 3px rgba(60,60,60,0.3);
+        }
+
+        .cast-iron-pan .pan-handle::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #3a3a3a 0%, #1a1a1a 100%);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .cast-iron-pan .food-item {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .cast-iron-pan .egg {
+            width: 50px;
+            height: 50px;
+            bottom: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .cast-iron-pan .egg-white {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse,
+                rgba(255,255,255,0.95) 0%,
+                rgba(255,255,255,0.85) 60%,
+                rgba(255,248,220,0.9) 100%);
+            border-radius: 45% 55% 50% 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .cast-iron-pan .egg-yolk {
+            position: absolute;
+            top: 35%;
+            left: 35%;
+            width: 30%;
+            height: 30%;
+            background: radial-gradient(circle at 30% 30%,
+                #ffeb3b 0%,
+                #ffc107 50%,
+                #ff9800 100%);
+            border-radius: 50%;
+            box-shadow:
+                inset 0 -2px 4px rgba(0,0,0,0.2),
+                0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .cast-iron-pan .sizzle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        /* Premium Recipe Book */
+        .recipe-book {
+            position: relative;
+            width: 180px;
+            height: 140px;
+            transform-style: preserve-3d;
+            perspective: 1200px;
+        }
+
+        .recipe-book .book-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(90deg,
+                #8b4513 0%,
+                #a0522d 50%,
+                #8b4513 100%);
+            box-shadow:
+                inset -2px 0 5px rgba(0,0,0,0.3),
+                inset 2px 0 3px rgba(255,255,255,0.1);
+            border-radius: 5px 0 0 5px;
+        }
+
+        .recipe-book .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg,
+                #a0522d 0%,
+                #8b4513 50%,
+                #704214 100%);
+            border-radius: 5px 15px 15px 5px;
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                inset 0 -1px 0 rgba(0,0,0,0.3);
+            transform-origin: left center;
+        }
+
+        .recipe-book .book-cover::before {
+            content: '✨ Culinary Quest ✨';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: #ffd700;
+            text-shadow:
+                0 0 10px rgba(255,215,0,0.5),
+                0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+        }
+
+        .recipe-book .book-page {
+            position: absolute;
+            width: 94%;
+            height: 90%;
+            background: linear-gradient(90deg,
+                #faf8f5 0%,
+                #f5f0e8 10%,
+                #f5f0e8 90%,
+                #e8e0d0 100%);
+            top: 5%;
+            left: 3%;
+            border-radius: 3px 12px 12px 3px;
+            transform-origin: left center;
+            opacity: 0;
+            box-shadow:
+                0 2px 5px rgba(0,0,0,0.2),
+                inset -2px 0 3px rgba(0,0,0,0.05);
+        }
+
+        .recipe-book .page-content {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 15%;
+            overflow: hidden;
+        }
+
+        .recipe-book .page-line {
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                #d0c0a0 10%,
+                #d0c0a0 90%,
+                transparent 100%);
+            margin: 12px 0;
+            opacity: 0.5;
+        }
+
+        /* Premium Knife & Cutting Board */
+        .knife-board {
+            position: relative;
+            width: 200px;
+            height: 160px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .knife-board .board {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(5deg);
+            width: 160px;
+            height: 100px;
+            background: linear-gradient(180deg,
+                #d4a574 0%,
+                #c8956d 50%,
+                #a0744b 100%);
+            border-radius: 15px;
+            box-shadow:
+                0 10px 25px rgba(0,0,0,0.4),
+                inset 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .knife-board .board::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            right: 5%;
+            height: 1px;
+            background: rgba(0,0,0,0.1);
+            box-shadow:
+                0 8px 0 rgba(0,0,0,0.1),
+                0 16px 0 rgba(0,0,0,0.1),
+                0 24px 0 rgba(0,0,0,0.1),
+                0 32px 0 rgba(0,0,0,0.1),
+                0 40px 0 rgba(0,0,0,0.1),
+                0 48px 0 rgba(0,0,0,0.1),
+                0 56px 0 rgba(0,0,0,0.1),
+                0 64px 0 rgba(0,0,0,0.1);
+        }
+
+        .knife-board .knife {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            width: 120px;
+            height: 20px;
+            transform-origin: left center;
+            transform: translateX(-60px) rotate(-5deg);
+        }
+
+        .knife-board .knife-blade {
+            position: absolute;
+            width: 85px;
+            height: 20px;
+            background: linear-gradient(90deg,
+                #e8e8e8 0%,
+                #f5f5f5 30%,
+                #d0d0d0 70%,
+                #b8b8b8 100%);
+            clip-path: polygon(0 40%, 90% 30%, 100% 50%, 90% 70%, 0 60%);
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.3),
+                inset 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .knife-board .knife-handle {
+            position: absolute;
+            right: 0;
+            width: 40px;
+            height: 18px;
+            background: linear-gradient(90deg,
+                #3a3a3a 0%,
+                #2a2a2a 50%,
+                #1a1a1a 100%);
+            border-radius: 3px 8px 8px 3px;
+            box-shadow:
+                0 2px 5px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(255,255,255,0.1);
+        }
+
+        .knife-board .knife-handle::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            box-shadow:
+                0 3px 0 rgba(255,255,255,0.1),
+                0 -3px 0 rgba(255,255,255,0.1);
+        }
+
+        .knife-board .chop-mark {
+            position: absolute;
+            width: 2px;
+            height: 30px;
+            background: rgba(0,0,0,0.2);
+            opacity: 0;
+        }
+
+        .knife-board .veggie-slice {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        /* Premium Stand Mixer */
+        .stand-mixer {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .stand-mixer .mixer-head {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 80px;
+            background: linear-gradient(135deg,
+                #ff6b6b 0%,
+                #e85d5d 50%,
+                #d04040 100%);
+            border-radius: 50px 50px 20px 20px;
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.4),
+                inset 0 2px 5px rgba(255,255,255,0.3),
+                inset 0 -2px 5px rgba(0,0,0,0.2);
+            transform-origin: bottom center;
+        }
+
+        .stand-mixer .mixer-head::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle,
+                rgba(255,255,255,0.3) 0%,
+                rgba(255,255,255,0.1) 100%);
+            border-radius: 50%;
+        }
+
+        .stand-mixer .mixer-base {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 60px;
+            background: linear-gradient(180deg,
+                #e0e0e0 0%,
+                #c0c0c0 50%,
+                #a0a0a0 100%);
+            border-radius: 10px 10px 30px 30px;
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.3),
+                inset 0 2px 3px rgba(255,255,255,0.5);
+        }
+
+        .stand-mixer .mixer-bowl {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 50px;
+            background: linear-gradient(180deg,
+                #f0f0f0 0%,
+                #d8d8d8 100%);
+            border-radius: 0 0 45px 45px;
+            box-shadow:
+                0 5px 10px rgba(0,0,0,0.2),
+                inset 0 -2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stand-mixer .beater {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            width: 30px;
+            height: 40px;
+            transform: translateX(-50%);
+            transform-origin: top center;
+        }
+
+        .stand-mixer .beater-wire {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: #c0c0c0;
+            box-shadow: 0 0 2px rgba(0,0,0,0.2);
+        }
+
+        .stand-mixer .beater-wire:nth-child(1) { left: 25%; }
+        .stand-mixer .beater-wire:nth-child(2) { left: 50%; }
+        .stand-mixer .beater-wire:nth-child(3) { left: 75%; }
+
+        .stand-mixer .flour-puff {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle,
+                rgba(255,255,255,0.9) 0%,
+                rgba(255,255,255,0.3) 100%);
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0;
+        }
+
+        /* Premium Oven */
+        .oven-loader {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .oven-loader .oven-body {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 120px;
+            background: linear-gradient(180deg,
+                #3a3a3a 0%,
+                #2a2a2a 50%,
+                #1a1a1a 100%);
+            border-radius: 10px;
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.5),
+                inset 0 2px 3px rgba(60,60,60,0.3);
+        }
+
+        .oven-loader .oven-door {
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            right: 10px;
+            height: 70px;
+            background: linear-gradient(135deg,
+                rgba(50,50,50,0.9) 0%,
+                rgba(30,30,30,0.9) 100%);
+            border-radius: 5px;
+            border: 2px solid #505050;
+            transform-origin: bottom center;
+        }
+
+        .oven-loader .oven-window {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: linear-gradient(135deg,
+                rgba(255,150,50,0.3) 0%,
+                rgba(255,100,0,0.2) 100%);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .oven-loader .oven-rack {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #606060;
+            box-shadow:
+                0 5px 0 #606060,
+                0 -5px 0 #606060;
+        }
+
+        .oven-loader .oven-control {
+            position: absolute;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle,
+                #808080 0%,
+                #606060 100%);
+            border-radius: 50%;
+            box-shadow:
+                inset 0 1px 2px rgba(0,0,0,0.5),
+                0 1px 2px rgba(255,255,255,0.1);
+        }
+
+        .oven-loader .oven-control:nth-child(5) { right: 10px; }
+        .oven-loader .oven-control:nth-child(6) { right: 35px; }
+        .oven-loader .oven-control:nth-child(7) { right: 60px; }
+
+        .oven-loader .heat-wave {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255,100,0,0.6) 50%,
+                transparent 100%);
+            filter: blur(1px);
+            opacity: 0;
+        }
+
+        /* Premium Coffee Grinder */
+        .coffee-grinder {
+            position: relative;
+            width: 160px;
+            height: 180px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .coffee-grinder .grinder-top {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 30px;
+            background: linear-gradient(180deg,
+                #8b4513 0%,
+                #654321 100%);
+            border-radius: 40px 40px 5px 5px;
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.4),
+                inset 0 2px 3px rgba(255,255,255,0.1);
+        }
+
+        .coffee-grinder .grinder-handle {
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            width: 40px;
+            height: 8px;
+            background: linear-gradient(90deg,
+                #654321 0%,
+                #8b4513 100%);
+            border-radius: 4px;
+            transform-origin: left center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .coffee-grinder .grinder-handle::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: -2px;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle,
+                #8b4513 0%,
+                #654321 100%);
+            border-radius: 50%;
+            box-shadow:
+                inset 0 1px 2px rgba(0,0,0,0.3),
+                0 1px 2px rgba(255,255,255,0.1);
+        }
+
+        .coffee-grinder .grinder-body {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(180deg,
+                #654321 0%,
+                #4a3018 50%,
+                #3a2010 100%);
+            border-radius: 10px;
+            box-shadow:
+                0 10px 25px rgba(0,0,0,0.5),
+                inset 0 2px 5px rgba(255,255,255,0.05);
+        }
+
+        .coffee-grinder .grinder-drawer {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 30px;
+            background: linear-gradient(180deg,
+                #8b4513 0%,
+                #654321 100%);
+            border-radius: 5px;
+            box-shadow:
+                inset 0 2px 5px rgba(0,0,0,0.3),
+                0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .coffee-grinder .grinder-drawer::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 8px;
+            background: #4a3018;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .coffee-grinder .coffee-bean {
+            position: absolute;
+            width: 12px;
+            height: 18px;
+            background: radial-gradient(ellipse,
+                #4a3018 0%,
+                #2a1808 100%);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            opacity: 0;
+        }
+
+        .coffee-grinder .coffee-bean::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 60%;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .coffee-grinder .ground-coffee {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #2a1808;
+            border-radius: 2px;
+            opacity: 0;
+        }
+
+        /* Premium French Press */
+        .french-press {
+            position: relative;
+            width: 160px;
+            height: 180px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .french-press .press-beaker {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 110px;
+            background: linear-gradient(180deg,
+                rgba(200,200,200,0.3) 0%,
+                rgba(180,180,180,0.2) 100%);
+            border: 2px solid #c0c0c0;
+            border-radius: 10px;
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.3),
+                inset 0 0 10px rgba(255,255,255,0.1);
+        }
+
+        .french-press .coffee-liquid {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            height: 0;
+            background: linear-gradient(180deg,
+                rgba(46,25,15,0.9) 0%,
+                rgba(28,15,8,0.95) 100%);
+            border-radius: 0 0 8px 8px;
+            transition: height 2s ease;
+        }
+
+        .french-press .press-handle {
+            position: absolute;
+            bottom: 60px;
+            right: -25px;
+            width: 30px;
+            height: 40px;
+            border: 3px solid #1a1a1a;
+            border-left: none;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .french-press .press-lid {
+            position: absolute;
+            top: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 84px;
+            height: 15px;
+            background: linear-gradient(180deg,
+                #3a3a3a 0%,
+                #1a1a1a 100%);
+            border-radius: 10px;
+            box-shadow:
+                0 3px 8px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(255,255,255,0.1);
+        }
+
+        .french-press .press-plunger {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 60px;
+            background: linear-gradient(180deg,
+                #c0c0c0 0%,
+                #808080 100%);
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transform-origin: bottom center;
+        }
+
+        .french-press .press-knob {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 16px;
+            background: radial-gradient(circle,
+                #3a3a3a 0%,
+                #1a1a1a 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 2px 5px rgba(0,0,0,0.4),
+                inset 0 1px 2px rgba(255,255,255,0.1);
+        }
+
+        .french-press .coffee-bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%,
+                rgba(139,69,19,0.3),
+                rgba(46,25,15,0.1));
+            opacity: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .loader-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Culinary Quest</h1>
+        <p class="subtitle">Crafting your perfect recipe...</p>
+    </div>
+
+    <div class="loader-grid">
+        <!-- Premium Cooking Pot -->
+        <div class="loader-container">
+            <div class="cooking-pot">
+                <div class="pot-body"></div>
+                <div class="pot-handle left"></div>
+                <div class="pot-handle right"></div>
+                <div class="pot-lid">
+                    <div class="pot-lid-handle"></div>
+                </div>
+                <div class="bubble" style="width: 8px; height: 8px; bottom: 50px; left: 45%;"></div>
+                <div class="bubble" style="width: 6px; height: 6px; bottom: 55px; left: 55%;"></div>
+                <div class="bubble" style="width: 10px; height: 10px; bottom: 45px; left: 50%;"></div>
+                <div class="steam-particle" style="bottom: 100px; left: 40%;"></div>
+                <div class="steam-particle" style="bottom: 100px; left: 50%;"></div>
+                <div class="steam-particle" style="bottom: 100px; left: 60%;"></div>
+            </div>
+            <div class="loader-title">Simmering Ingredients</div>
+            <div class="loading-text">Creating Magic</div>
+        </div>
+
+        <!-- Cast Iron Pan -->
+        <div class="loader-container">
+            <div class="cast-iron-pan">
+                <div class="pan-body"></div>
+                <div class="pan-handle"></div>
+                <div class="food-item egg">
+                    <div class="egg-white"></div>
+                    <div class="egg-yolk"></div>
+                </div>
+                <div class="sizzle" style="bottom: 70px; left: 45%;"></div>
+                <div class="sizzle" style="bottom: 75px; left: 55%;"></div>
+                <div class="sizzle" style="bottom: 65px; left: 50%;"></div>
+            </div>
+            <div class="loader-title">Pan Searing</div>
+            <div class="loading-text">Perfecting Flavors</div>
+        </div>
+
+        <!-- Recipe Book -->
+        <div class="loader-container">
+            <div class="recipe-book">
+                <div class="book-spine"></div>
+                <div class="book-cover"></div>
+                <div class="book-page">
+                    <div class="page-content">
+                        <div class="page-line"></div>
+                        <div class="page-line"></div>
+                        <div class="page-line"></div>
+                        <div class="page-line"></div>
+                        <div class="page-line"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="loader-title">Discovering Recipes</div>
+            <div class="loading-text">Curating Classics</div>
+        </div>
+
+        <!-- Knife & Cutting Board -->
+        <div class="loader-container">
+            <div class="knife-board">
+                <div class="board"></div>
+                <div class="knife">
+                    <div class="knife-blade"></div>
+                    <div class="knife-handle"></div>
+                </div>
+                <div class="chop-mark" style="bottom: 45px; left: 45%;"></div>
+                <div class="chop-mark" style="bottom: 45px; left: 50%;"></div>
+                <div class="chop-mark" style="bottom: 45px; left: 55%;"></div>
+                <div class="veggie-slice" style="background: #ff6347; bottom: 35px; left: 40%;"></div>
+                <div class="veggie-slice" style="background: #ffa500; bottom: 35px; left: 50%;"></div>
+                <div class="veggie-slice" style="background: #90ee90; bottom: 35px; left: 60%;"></div>
+            </div>
+            <div class="loader-title">Precision Cutting</div>
+            <div class="loading-text">Prep Work</div>
+        </div>
+
+        <!-- Stand Mixer -->
+        <div class="loader-container">
+            <div class="stand-mixer">
+                <div class="mixer-head"></div>
+                <div class="mixer-base"></div>
+                <div class="mixer-bowl"></div>
+                <div class="beater">
+                    <div class="beater-wire"></div>
+                    <div class="beater-wire"></div>
+                    <div class="beater-wire"></div>
+                </div>
+                <div class="flour-puff" style="bottom: 70px; left: 40%;"></div>
+                <div class="flour-puff" style="bottom: 75px; left: 50%;"></div>
+                <div class="flour-puff" style="bottom: 70px; left: 60%;"></div>
+            </div>
+            <div class="loader-title">Mixing Perfection</div>
+            <div class="loading-text">Blending</div>
+        </div>
+
+        <!-- Oven -->
+        <div class="loader-container">
+            <div class="oven-loader">
+                <div class="oven-body">
+                    <div class="oven-door">
+                        <div class="oven-window">
+                            <div class="oven-rack"></div>
+                        </div>
+                    </div>
+                    <div class="oven-control"></div>
+                    <div class="oven-control"></div>
+                    <div class="oven-control"></div>
+                </div>
+                <div class="heat-wave" style="bottom: 40px;"></div>
+                <div class="heat-wave" style="bottom: 50px;"></div>
+                <div class="heat-wave" style="bottom: 60px;"></div>
+            </div>
+            <div class="loader-title">Baking Excellence</div>
+            <div class="loading-text">Rising</div>
+        </div>
+
+        <!-- Coffee Grinder -->
+        <div class="loader-container">
+            <div class="coffee-grinder">
+                <div class="grinder-top"></div>
+                <div class="grinder-handle"></div>
+                <div class="grinder-body"></div>
+                <div class="grinder-drawer"></div>
+                <div class="coffee-bean" style="top: 30px; left: 45%;"></div>
+                <div class="coffee-bean" style="top: 35px; left: 55%;"></div>
+                <div class="coffee-bean" style="top: 28px; left: 50%;"></div>
+                <div class="ground-coffee" style="bottom: 50px; left: 45%;"></div>
+                <div class="ground-coffee" style="bottom: 48px; left: 50%;"></div>
+                <div class="ground-coffee" style="bottom: 52px; left: 55%;"></div>
+            </div>
+            <div class="loader-title">Grinding Fresh</div>
+            <div class="loading-text">Aromatic</div>
+        </div>
+
+        <!-- French Press -->
+        <div class="loader-container">
+            <div class="french-press">
+                <div class="press-beaker"></div>
+                <div class="coffee-liquid"></div>
+                <div class="press-handle"></div>
+                <div class="press-lid"></div>
+                <div class="press-plunger">
+                    <div class="press-knob"></div>
+                </div>
+                <div class="coffee-bubble" style="width: 5px; height: 5px; bottom: 40px; left: 45%;"></div>
+                <div class="coffee-bubble" style="width: 7px; height: 7px; bottom: 45px; left: 55%;"></div>
+                <div class="coffee-bubble" style="width: 4px; height: 4px; bottom: 50px; left: 50%;"></div>
+            </div>
+            <div class="loader-title">Brewing Perfection</div>
+            <div class="loading-text">Steeping</div>
+        </div>
+    </div>
+
+    <script>
+        // Premium Cooking Pot Animation
+        function animateCookingPot() {
+            const tl = anime.timeline({ loop: true });
+
+            // Lid animation
+            tl.add({
+                targets: '.cooking-pot .pot-lid',
+                translateY: [-5, -15, -5],
+                rotate: [0, -3, 0],
+                duration: 2000,
+                easing: 'easeInOutQuad'
+            })
+            // Bubbles
+            .add({
+                targets: '.cooking-pot .bubble',
+                opacity: [0, 1, 0],
+                translateY: [10, -20],
+                scale: [0.5, 1.2, 0.8],
+                delay: anime.stagger(200),
+                duration: 1500,
+                easing: 'easeOutQuad'
+            }, '-=1500')
+            // Steam
+            .add({
+                targets: '.cooking-pot .steam-particle',
+                opacity: [0, 0.8, 0],
+                translateY: [0, -40],
+                translateX: (el, i) => [0, (i - 1) * 10],
+                scale: [0.5, 1.5],
+                delay: anime.stagger(100),
+                duration: 2000,
+                easing: 'easeOutQuad'
+            }, '-=1000')
+            // Pot wobble
+            .add({
+                targets: '.cooking-pot .pot-body',
+                rotate: [-0.5, 0.5, -0.5, 0.5, 0],
+                duration: 800,
+                easing: 'easeInOutQuad'
+            }, '-=2000');
+        }
+
+        // Cast Iron Pan Animation
+        function animateCastIronPan() {
+            const tl = anime.timeline({ loop: true });
+
+            tl.add({
+                targets: '.cast-iron-pan .egg',
+                opacity: [0, 1],
+                scale: [0, 1],
+                duration: 800,
+                easing: 'easeOutBack'
+            })
+            .add({
+                targets: '.cast-iron-pan .egg-white',
+                scale: [1, 1.1, 1],
+                duration: 2000,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.cast-iron-pan .egg-yolk',
+                translateY: [0, 2, 0],
+                duration: 1500,
+                easing: 'easeInOutSine'
+            }, '-=2000')
+            .add({
+                targets: '.cast-iron-pan .sizzle',
+                opacity: [0, 1, 0],
+                scale: [0, 1.5, 0],
+                translateY: [0, -10],
+                delay: anime.stagger(100),
+                duration: 800,
+                easing: 'easeOutQuad'
+            }, '-=1500')
+            .add({
+                targets: '.cast-iron-pan .pan-body',
+                rotate: [-1, 1, -1, 1, 0],
+                duration: 600,
+                easing: 'easeInOutQuad'
+            }, '-=1500')
+            .add({
+                targets: '.cast-iron-pan .egg',
+                opacity: [1, 0],
+                scale: [1, 0],
+                duration: 600,
+                easing: 'easeInBack'
+            });
+        }
+
+        // Recipe Book Animation
+        function animateRecipeBook() {
+            const tl = anime.timeline({ loop: true });
+
+            tl.add({
+                targets: '.recipe-book .book-cover',
+                rotateY: [0, -25],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.recipe-book .book-page',
+                opacity: [0, 1],
+                rotateY: [90, 0],
+                duration: 800,
+                easing: 'easeOutQuad'
+            }, '-=400')
+            .add({
+                targets: '.recipe-book .page-line',
+                opacity: [0, 0.5],
+                translateX: [-20, 0],
+                delay: anime.stagger(100),
+                duration: 500,
+                easing: 'easeOutQuad'
+            })
+            .add({
+                targets: '.recipe-book .book-page',
+                rotateY: [0, -180],
+                duration: 1500,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.recipe-book .book-page',
+                opacity: [1, 0],
+                duration: 300
+            }, '-=500')
+            .add({
+                targets: '.recipe-book .book-cover',
+                rotateY: [-25, 0],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            });
+        }
+
+        // Knife & Board Animation
+        function animateKnifeBoard() {
+            const tl = anime.timeline({ loop: true });
+
+            tl.add({
+                targets: '.knife-board .knife',
+                rotate: [-5, -30, -5],
+                duration: 600,
+                easing: 'easeOutCubic'
+            })
+            .add({
+                targets: '.knife-board .chop-mark',
+                opacity: [0, 0.3, 0],
+                scaleY: [0, 1, 1],
+                delay: anime.stagger(100),
+                duration: 400,
+                easing: 'easeOutQuad'
+            }, '-=300')
+            .add({
+                targets: '.knife-board .veggie-slice',
+                opacity: [0, 1],
+                translateY: [0, -20],
+                translateX: (el, i) => [0, (i - 1) * 20],
+                rotate: anime.random(-180, 180),
+                delay: anime.stagger(100),
+                duration: 800,
+                easing: 'easeOutBack'
+            })
+            .add({
+                targets: '.knife-board .veggie-slice',
+                translateY: [-20, 10],
+                opacity: [1, 0],
+                duration: 1000,
+                easing: 'easeInQuad'
+            })
+            .add({
+                targets: '.knife-board .board',
+                rotateX: [5, 3, 5],
+                duration: 500,
+                easing: 'easeInOutQuad'
+            }, '-=800');
+        }
+
+        // Stand Mixer Animation
+        function animateStandMixer() {
+            const tl = anime.timeline({ loop: true });
+
+            tl.add({
+                targets: '.stand-mixer .mixer-head',
+                rotateX: [0, -10, 0],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.stand-mixer .beater',
+                rotate: [0, 720],
+                duration: 3000,
+                easing: 'linear'
+            }, '-=500')
+            .add({
+                targets: '.stand-mixer .flour-puff',
+                opacity: [0, 0.8, 0],
+                scale: [0.5, 1.5, 1],
+                translateY: [0, -30],
+                translateX: (el, i) => [0, (i - 1) * 15],
+                delay: anime.stagger(200),
+                duration: 1500,
+                easing: 'easeOutQuad'
+            }, '-=2500')
+            .add({
+                targets: '.stand-mixer .mixer-bowl',
+                rotate: [-1, 1, -1, 1, 0],
+                duration: 800,
+                easing: 'easeInOutQuad'
+            }, '-=2000');
+        }
+
+        // Oven Animation
+        function animateOven() {
+            const tl = anime.timeline({ loop: true });
+
+            tl.add({
+                targets: '.oven-loader .oven-door',
+                rotateX: [0, -15],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.oven-loader .oven-window',
+                background: ['linear-gradient(135deg, rgba(255,150,50,0.3) 0%, rgba(255,100,0,0.2) 100%)',
+                           'linear-gradient(135deg, rgba(255,200,100,0.5) 0%, rgba(255,150,50,0.4) 100%)'],
+                duration: 2000,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.oven-loader .heat-wave',
+                opacity: [0, 0.6, 0],
+                translateY: [0, -20],
+                scaleX: [0.5, 1.2, 0.8],
+                delay: anime.stagger(200),
+                duration: 1500,
+                easing: 'easeOutQuad'
+            }, '-=1500')
+            .add({
+                targets: '.oven-loader .oven-control',
+                rotate: [0, 180],
+                delay: anime.stagger(100),
+                duration: 600,
+                easing: 'easeInOutQuad'
+            }, '-=1000')
+            .add({
+                targets: '.oven-loader .oven-door',
+                rotateX: [-15, 0],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            });
+        }
+
+        // Coffee Grinder Animation
+        function animateCoffeeGrinder() {
+            const tl = anime.timeline({ loop: true });
+
+            tl.add({
+                targets: '.coffee-grinder .coffee-bean',
+                opacity: [0, 1],
+                translateY: [-20, 0],
+                rotate: anime.random(-180, 180),
+                delay: anime.stagger(150),
+                duration: 600,
+                easing: 'easeOutBounce'
+            })
+            .add({
+                targets: '.coffee-grinder .grinder-handle',
+                rotate: [0, 360, 720],
+                duration: 2500,
+                easing: 'linear'
+            })
+            .add({
+                targets: '.coffee-grinder .coffee-bean',
+                opacity: [1, 0],
+                scale: [1, 0],
+                duration: 500,
+                easing: 'easeInQuad'
+            }, '-=2000')
+            .add({
+                targets: '.coffee-grinder .ground-coffee',
+                opacity: [0, 1, 1, 0],
+                translateY: [0, 20],
+                delay: anime.stagger(100),
+                duration: 1000,
+                easing: 'easeOutQuad'
+            }, '-=1500')
+            .add({
+                targets: '.coffee-grinder .grinder-drawer',
+                translateX: [-5, 5, 0],
+                duration: 600,
+                easing: 'easeInOutQuad'
+            }, '-=800');
+        }
+
+        // French Press Animation
+        function animateFrenchPress() {
+            const tl = anime.timeline({ loop: true });
+
+            tl.add({
+                targets: '.french-press .coffee-liquid',
+                height: [0, 80],
+                duration: 1500,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.french-press .coffee-bubble',
+                opacity: [0, 0.6, 0],
+                translateY: [20, -20],
+                scale: [0.5, 1.2, 0.8],
+                delay: anime.stagger(150),
+                duration: 1200,
+                easing: 'easeOutQuad'
+            }, '-=1000')
+            .add({
+                targets: '.french-press .press-plunger',
+                translateY: [0, 40],
+                duration: 2000,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.french-press .press-knob',
+                rotate: [0, 90, 0],
+                duration: 800,
+                easing: 'easeInOutQuad'
+            }, '-=1500')
+            .add({
+                targets: '.french-press .coffee-liquid',
+                opacity: [1, 0.8, 1],
+                duration: 500,
+                easing: 'easeInOutQuad'
+            })
+            .add({
+                targets: '.french-press .coffee-liquid',
+                height: [80, 0],
+                duration: 1000,
+                easing: 'easeInQuad'
+            })
+            .add({
+                targets: '.french-press .press-plunger',
+                translateY: [40, 0],
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }, '-=1000');
+        }
+
+        // Loading text animations
+        function animateLoadingTexts() {
+            anime({
+                targets: '.loading-text',
+                opacity: [0.3, 0.8, 0.3],
+                letterSpacing: ['0.15em', '0.25em', '0.15em'],
+                duration: 2000,
+                easing: 'easeInOutQuad',
+                loop: true
+            });
+
+            anime({
+                targets: '.loader-container',
+                scale: [0.98, 1, 0.98],
+                duration: 4000,
+                delay: anime.stagger(200),
+                easing: 'easeInOutSine',
+                loop: true
+            });
+        }
+
+        // Initialize all animations
+        document.addEventListener('DOMContentLoaded', () => {
+            animateCookingPot();
+            animateCastIronPan();
+            animateRecipeBook();
+            animateKnifeBoard();
+            animateStandMixer();
+            animateOven();
+            animateCoffeeGrinder();
+            animateFrenchPress();
+            animateLoadingTexts();
+        });
+    </script>
+</body>
+</html>
