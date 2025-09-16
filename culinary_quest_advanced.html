@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Culinary Quest - Ultra Premium Loading Animations</title>
-    <!-- Anime.js via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Resource hints & deferred anime -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Removed anime.js dependency - using CSS animations instead -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -128,6 +132,15 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             overflow: hidden;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            content-visibility: auto;
+            contain-intrinsic-size: 420px 400px;
+        }
+
+        /* Low-end mode visuals */
+        [data-low-end="1"] .loader-container {
+            backdrop-filter: none;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+            border-color: rgba(255, 255, 255, 0.08);
         }
 
         .loader-container::before {
@@ -741,7 +754,19 @@
     </div>
 
     <script>
-        // Advanced Wok Animation with Fire Physics
+        const REDUCE_MOTION = typeof window !== 'undefined' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const LOW_END = (() => {
+            try {
+                const dm = navigator.deviceMemory || 0;
+                const hc = navigator.hardwareConcurrency || 0;
+                const sd = navigator.connection && navigator.connection.saveData;
+                return sd || dm && dm <= 2 || hc && hc <= 4;
+            } catch { return false; }
+        })();
+        if (LOW_END) document.documentElement.setAttribute('data-low-end', '1');
+    // Advanced Wok Animation with Fire Physics
         function animateWok() {
             const tl = anime.timeline({ loop: true });
 
@@ -1223,52 +1248,64 @@
 
         // Global animation effects
         function initGlobalAnimations() {
-            // Floating particles
-            anime({
-                targets: '.particle',
-                translateY: () => anime.random(-100, 100),
-                translateX: () => anime.random(-50, 50),
-                scale: [0, 1, 0],
-                opacity: [0, 1, 0],
-                duration: () => anime.random(3000, 5000),
-                delay: () => anime.random(0, 2000),
-                easing: 'easeInOutSine',
-                loop: true
-            });
-
-            // Container glow on hover
-            document.querySelectorAll('.loader-container').forEach(container => {
-                container.addEventListener('mousemove', (e) => {
-                    const rect = container.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                    const y = ((e.clientY - rect.top) / rect.height) * 100;
-                    container.style.setProperty('--mouse-x', `${x}%`);
-                    container.style.setProperty('--mouse-y', `${y}%`);
+            // Container glow on hover (throttled with rAF)
+            if (!REDUCE_MOTION) {
+                document.querySelectorAll('.loader-container').forEach(container => {
+                    let rafPending = false;
+                    let lastX = 50, lastY = 50;
+                    const update = () => {
+                        rafPending = false;
+                        container.style.setProperty('--mouse-x', `${lastX}%`);
+                        container.style.setProperty('--mouse-y', `${lastY}%`);
+                    };
+                    container.addEventListener('mousemove', (e) => {
+                        const rect = container.getBoundingClientRect();
+                        lastX = ((e.clientX - rect.left) / rect.width) * 100;
+                        lastY = ((e.clientY - rect.top) / rect.height) * 100;
+                        if (!rafPending) {
+                            rafPending = true;
+                            requestAnimationFrame(update);
+                        }
+                    }, { passive: true });
                 });
-            });
-
-            // Loading text pulse
-            anime({
-                targets: '.loading-text',
-                opacity: [0.4, 0.8, 0.4],
-                letterSpacing: ['0.3em', '0.4em', '0.3em'],
-                duration: 2000,
-                easing: 'easeInOutSine',
-                loop: true
-            });
+            }
         }
 
         // Initialize all animations
         document.addEventListener('DOMContentLoaded', () => {
-            animateWok();
-            animateMolecular();
-            animateSushi();
-            animatePizza();
-            animateWine();
-            animateBread();
-            animateDimSum();
-            animateCocktail();
+            console.time('cq-advanced:init');
+            if (!window.anime) return;
+            anime.suspendWhenDocumentHidden = true;
+
+            // Always init lightweight globals
             initGlobalAnimations();
+
+            if (REDUCE_MOTION) return;
+
+            const tasks = [
+                animateWok,
+                animateMolecular,
+                animateSushi,
+                animatePizza,
+                animateWine,
+                animateBread,
+                animateDimSum,
+                animateCocktail
+            ];
+
+            let i = 0;
+            const step = () => {
+                if (i >= tasks.length) return;
+                try { tasks[i++](); } catch {}
+                setTimeout(step, 70);
+            };
+
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(step, { timeout: 1500 });
+            } else {
+                setTimeout(step, 0);
+            }
+            console.timeEnd('cq-advanced:init');
         });
     </script>
 </body>

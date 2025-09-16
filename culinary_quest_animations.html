@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Culinary Quest - Recipe Generation Loading Animations</title>
-    <!-- Anime.js via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Resource hints & deferred anime -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Removed anime.js dependency - using CSS animations instead -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
 
@@ -94,6 +98,14 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            content-visibility: auto;
+            contain-intrinsic-size: 360px 320px;
+        }
+
+        [data-low-end="1"] .loader-container {
+            backdrop-filter: none;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.08);
         }
 
         .loader-container:hover {
@@ -1182,6 +1194,18 @@
     </div>
 
     <script>
+        const REDUCE_MOTION = typeof window !== 'undefined' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const LOW_END = (() => {
+            try {
+                const dm = navigator.deviceMemory || 0;
+                const hc = navigator.hardwareConcurrency || 0;
+                const sd = navigator.connection && navigator.connection.saveData;
+                return sd || dm && dm <= 2 || hc && hc <= 4;
+            } catch { return false; }
+        })();
+        if (LOW_END) document.documentElement.setAttribute('data-low-end', '1');
         // Premium Cooking Pot Animation
         function animateCookingPot() {
             const tl = anime.timeline({ loop: true });
@@ -1526,38 +1550,39 @@
             }, '-=1000');
         }
 
-        // Loading text animations
-        function animateLoadingTexts() {
-            anime({
-                targets: '.loading-text',
-                opacity: [0.3, 0.8, 0.3],
-                letterSpacing: ['0.15em', '0.25em', '0.15em'],
-                duration: 2000,
-                easing: 'easeInOutQuad',
-                loop: true
-            });
-
-            anime({
-                targets: '.loader-container',
-                scale: [0.98, 1, 0.98],
-                duration: 4000,
-                delay: anime.stagger(200),
-                easing: 'easeInOutSine',
-                loop: true
-            });
-        }
+        // Loading text animations now handled by CSS
 
         // Initialize all animations
         document.addEventListener('DOMContentLoaded', () => {
-            animateCookingPot();
-            animateCastIronPan();
-            animateRecipeBook();
-            animateKnifeBoard();
-            animateStandMixer();
-            animateOven();
-            animateCoffeeGrinder();
-            animateFrenchPress();
+            console.time('cq-animations:init');
+            // CSS animations are now used instead of anime.js
+
+            // Lightweight text / container pulse
             animateLoadingTexts();
+            if (REDUCE_MOTION) return;
+
+            const tasks = [
+                animateCookingPot,
+                animateCastIronPan,
+                animateRecipeBook,
+                animateKnifeBoard,
+                animateStandMixer,
+                animateOven,
+                animateCoffeeGrinder,
+                animateFrenchPress
+            ];
+            let i = 0;
+            const kick = () => {
+                if (i >= tasks.length) return;
+                try { tasks[i++](); } catch {}
+                setTimeout(kick, 60);
+            };
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(kick, { timeout: 1500 });
+            } else {
+                setTimeout(kick, 0);
+            }
+            console.timeEnd('cq-animations:init');
         });
     </script>
 </body>

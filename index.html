@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enhanced Meal Prep & Adventure Animations</title>
-    <!-- Anime.js via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Resource hints -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <!-- Removed anime.js dependency - using CSS animations instead -->
     <style>
         /*
          * Overall page styling
@@ -59,6 +61,16 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.25);
             position: relative;
+            /* Skip layout/paint for offscreen content until scrolled into view */
+            content-visibility: auto;
+            contain-intrinsic-size: 320px 280px;
+        }
+
+        /* Low-end mode: tone down costly visual effects */
+        [data-low-end="1"] .loader-container {
+            backdrop-filter: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .loader-title {
@@ -74,6 +86,12 @@
             font-size: 0.8rem;
             opacity: 0.8;
             letter-spacing: 2px;
+            animation: pulse 2.4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
 
         /* Cooking Pot Loader – refined */
@@ -699,6 +717,22 @@
          * Timelines are defined separately for clarity and to allow fine‑tuning.
          */
 
+        // Respect user's reduced motion preference
+        const REDUCE_MOTION = typeof window !== 'undefined' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Auto-detect low-end devices (save-data, low memory/cores)
+        const LOW_END = (() => {
+            try {
+                const dm = navigator.deviceMemory || 0;
+                const hc = navigator.hardwareConcurrency || 0;
+                const sd = navigator.connection && navigator.connection.saveData;
+                return sd || dm && dm <= 2 || hc && hc <= 4;
+            } catch { return false; }
+        })();
+        if (LOW_END) document.documentElement.setAttribute('data-low-end', '1');
+
         // Cooking Pot Animation – improved with gentle bob and ingredient drop
         function animateCookingPot() {
             const tl = anime.timeline({ loop: true });
@@ -1031,30 +1065,48 @@
             }, '-=2600');
         }
 
-        // Loading text animations
-        function animateLoadingTexts() {
-            anime({
-                targets: '.loading-text',
-                opacity: [0.3, 1, 0.3],
-                duration: 2400,
-                easing: 'easeInOutQuad',
-                loop: true
-            });
-        }
+        // Loading text animations now handled by CSS
 
         // Initialize all animations
         document.addEventListener('DOMContentLoaded', () => {
-            animateCookingPot();
-            animateMapJourney();
-            animateRecipeBook();
-            animateCompassMeal();
-            animateAdventurePath();
-            animateMixingBowl();
-            animateChoppingBoard();
-            animateRollingDough();
-            animateGrill();
-            animateSpiceGrinder();
-            animateLoadingTexts();
+            // CSS animations are now used instead of anime.js
+            if (REDUCE_MOTION) {
+                // Respect reduced motion: skip heavy animations
+                document.querySelectorAll('.loading-text').forEach(el => {
+                    el.style.animation = 'none';
+                });
+                return;
+            }
+
+            // Stagger initialization to reduce main-thread spikes
+            const tasks = [
+                animateCookingPot,
+                animateMapJourney,
+                animateRecipeBook,
+                animateCompassMeal,
+                animateAdventurePath,
+                animateMixingBowl,
+                animateChoppingBoard,
+                animateRollingDough,
+                animateGrill,
+                animateSpiceGrinder
+            ];
+
+            const runStaggered = () => {
+                let i = 0;
+                const next = () => {
+                    if (i >= tasks.length) return;
+                    try { tasks[i++](); } catch (e) { /* no-op */ }
+                    setTimeout(next, 60); // small gap between initializations
+                };
+                next();
+            };
+
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(runStaggered, { timeout: 1500 });
+            } else {
+                setTimeout(runStaggered, 0);
+            }
         });
     </script>
 </body>
